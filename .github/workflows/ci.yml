@@ -92,8 +92,10 @@ jobs:
         with:
           channel: stable
           profile: minimal
+      - name: Install cargo-quickinstall
+        run: cargo install cargo-quickinstall
       - name: Install cargo-semver-checks
-        run: cargo install cargo-semver-checks --locked
+        run: cargo quickinstall cargo-semver-checks
       - name: Check semver compatibility
         run: cargo semver-checks
 
