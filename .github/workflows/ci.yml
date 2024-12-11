@@ -1,0 +1,121 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - "master"
+  pull_request:
+    branches:
+      - "master"
+  release:
+    types: [published]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup Rust
+        uses: MatteoH2O1999/setup-rust@v1
+        with:
+          channel: stable
+          profile: minimal
+          components: clippy rustfmt
+      - name: Check code formatting
+        run: cargo fmt -- --check
+      - name: Build clippy
+        run: cargo clippy
+      - name: Check clippy lint
+        run: cargo clippy -- -Dwarnings
+
+  docs:
+    name: Check docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup Rust
+        uses: MatteoH2O1999/setup-rust@v1
+        with:
+          channel: stable
+          profile: minimal
+          components: rust-docs
+      - name: Check docs
+        run: cargo doc
+        env:
+          RUSTDOCFLAGS: -D warnings
+
+  tests:
+    name: Unit tests on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup Rust
+        uses: MatteoH2O1999/setup-rust@v1
+        with:
+          channel: stable
+          profile: minimal
+      - name: Test build
+        run: cargo build --release
+      - name: Build tests
+        run: cargo test --no-run
+      - name: Run tests
+        run: cargo test
+
+  api:
+    name: Check semver compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup Rust
+        uses: MatteoH2O1999/setup-rust@v1
+        with:
+          channel: stable
+          profile: minimal
+      - name: Install cargo-semver-checks
+        run: cargo install cargo-semver-checks --locked
+      - name: Check semver compatibility
+        run: cargo semver-checks
+
+  publish:
+    needs: [api, docs, lint, tests]
+    name: Publish release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup Rust
+        uses: MatteoH2O1999/setup-rust@v1
+        with:
+          channel: stable
+          profile: minimal
+      - name: Test publishing
+        if: ${{ github.event_name != 'release' }}
+        run: cargo publish --dry-run
+      - name: Publish package
+        if: ${{ github.event_name == 'release' }}
+        run: cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
