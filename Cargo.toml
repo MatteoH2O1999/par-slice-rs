@@ -2,5 +2,9 @@
 name = "par_slice"
 version = "0.1.0"
 edition = "2021"
-
-[dependencies]
+authors = ["Matteo Dell'Acqua <dellacqua.matteo99@gmail.com>"]
+description = "Slices that may be accessed from multiple threads with different evels of safety"
+repository = "https://github.com/MatteoH2O1999/par-slice-rs"
+license = "MIT"
+keywords = ["slice", "par", "parallel", "access", "concurrent"]
+categories = ["concurrency"]
