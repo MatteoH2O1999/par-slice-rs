@@ -80,7 +80,7 @@ jobs:
         run: cargo test
 
   api:
-    name: Check semver compatibility
+    name: Check semver and MSV
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -94,10 +94,14 @@ jobs:
           profile: minimal
       - name: Install cargo-quickinstall
         run: cargo install cargo-quickinstall
-      - name: Install cargo-semver-checks
-        run: cargo quickinstall cargo-semver-checks
+      - name: Install cargo-semver-checks and cargo-msrv
+        run: cargo quickinstall cargo-semver-checks cargo-msrv
       - name: Check semver compatibility
         run: cargo semver-checks
+      - name: Check minimum Rust version
+        run: |
+          cargo msrv find --write-msrv --ignore-lockfile
+          git diff --exit-code
 
   publish:
     needs: [api, docs, lint, tests]
