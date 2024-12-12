@@ -79,6 +79,29 @@ jobs:
       - name: Run tests
         run: cargo test
 
+  miri:
+    name: Check for UB on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup Rust
+        uses: MatteoH2O1999/setup-rust@v1
+        with:
+          channel: nightly
+          profile: minimal
+          components: miri
+      - name: Build tests
+        run: cargo miri setup
+      - name: Run tests
+        run: cargo miri test
+
   api:
     name: Check semver and MSV
     runs-on: ubuntu-latest
