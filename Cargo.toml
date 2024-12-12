@@ -1,6 +1,6 @@
 [package]
 name = "par_slice"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 authors = ["Matteo Dell'Acqua <dellacqua.matteo99@gmail.com>"]
 description = "Slices that may be accessed from multiple threads with different evels of safety"
@@ -8,4 +8,4 @@ repository = "https://github.com/MatteoH2O1999/par-slice-rs"
 license = "MIT"
 keywords = ["slice", "par", "parallel", "access", "concurrent"]
 categories = ["concurrency"]
-rust-version = "1.56"
+rust-version = "1.79"
