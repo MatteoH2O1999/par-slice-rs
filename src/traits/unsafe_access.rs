@@ -1,4 +1,4 @@
-pub trait PointerParSlice<T> {
+pub unsafe trait PointerParSlice<T> {
     fn len(&self) -> usize;
 
     fn get_ptr_unchecked(&self, index: usize) -> *const T;

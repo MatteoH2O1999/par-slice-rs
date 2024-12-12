@@ -1,7 +1,7 @@
 use crate::PointerParSlice;
 use std::{cell::UnsafeCell, mem::size_of};
 
-impl<T> PointerParSlice<T> for UnsafeCell<[T]> {
+unsafe impl<T> PointerParSlice<T> for UnsafeCell<[T]> {
     #[inline(always)]
     fn get_ptr_unchecked(&self, index: usize) -> *const T {
         self.get_mut_ptr_unchecked(index) as *const T
