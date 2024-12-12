@@ -1,6 +1,6 @@
 [package]
 name = "par_slice"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Matteo Dell'Acqua <dellacqua.matteo99@gmail.com>"]
 description = "Slices that may be accessed from multiple threads with different evels of safety"
