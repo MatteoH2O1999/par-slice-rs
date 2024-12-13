@@ -129,9 +129,7 @@ pub trait UnsafeDataRaceParChunkSlice<T>: PointerParSlice<[T]> {
         T: Clone,
     {
         let fat_ptr = self.get_mut_ptr(index);
-        let len = fat_ptr.len();
-
-        assert_eq!(value.len(), len);
+        assert_eq!(value.len(), fat_ptr.len());
 
         let mut ptr = fat_ptr as *mut T;
 
@@ -152,9 +150,7 @@ pub trait UnsafeDataRaceParChunkSlice<T>: PointerParSlice<[T]> {
         T: Clone,
     {
         let fat_ptr = self.get_mut_ptr_unchecked(index);
-        let len = fat_ptr.len();
-
-        assert_eq!(value.len(), len);
+        debug_assert_eq!(value.len(), fat_ptr.len());
 
         let mut ptr = fat_ptr as *mut T;
 
