@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 pub trait ParSliceView<T> {
     fn as_pointer_par_slice(&mut self) -> impl PointerParSlice<T>;
