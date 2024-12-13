@@ -1,4 +1,4 @@
-pub unsafe trait PointerParSlice<T> {
+pub unsafe trait PointerParSlice<T: ?Sized> {
     fn len(&self) -> usize;
 
     fn get_ptr_unchecked(&self, index: usize) -> *const T;
@@ -23,15 +23,7 @@ pub unsafe trait PointerParSlice<T> {
     }
 }
 
-pub trait UnsafeDataRaceParSlice<T>: PointerParSlice<T> {
-    #[inline(always)]
-    unsafe fn set(&self, index: usize, value: T) {
-        unsafe {
-            // Safety: the caller must guarantee that there are no data races
-            *self.get_mut_ptr(index) = value
-        }
-    }
-
+pub trait UnsafeDataRaceParSlice<T: ?Sized>: PointerParSlice<T> {
     #[inline(always)]
     unsafe fn get(&self, index: usize) -> T
     where
@@ -40,14 +32,6 @@ pub trait UnsafeDataRaceParSlice<T>: PointerParSlice<T> {
         unsafe {
             // Safety: the caller must guarantee that there are no data races
             *self.get_ptr(index)
-        }
-    }
-
-    #[inline(always)]
-    unsafe fn set_unchecked(&self, index: usize, value: T) {
-        unsafe {
-            // Safety: the caller must guarantee that there are no data races
-            *self.get_mut_ptr_unchecked(index) = value
         }
     }
 
@@ -61,11 +45,55 @@ pub trait UnsafeDataRaceParSlice<T>: PointerParSlice<T> {
             *self.get_ptr_unchecked(index)
         }
     }
+
+    #[inline(always)]
+    unsafe fn get_clone(&self, index: usize) -> T
+    where
+        T: Clone,
+    {
+        unsafe {
+            // Safety: the caller must guarantee that there are no data races
+            (*self.get_ptr(index)).clone()
+        }
+    }
+
+    #[inline(always)]
+    unsafe fn get_clone_unchecked(&self, index: usize) -> T
+    where
+        T: Clone,
+    {
+        unsafe {
+            // Safety: the caller must guarantee that there are no data races
+            (*self.get_ptr_unchecked(index)).clone()
+        }
+    }
+
+    #[inline(always)]
+    unsafe fn set(&self, index: usize, value: T)
+    where
+        T: Sized,
+    {
+        unsafe {
+            // Safety: the caller must guarantee that there are no data races
+            *self.get_mut_ptr(index) = value
+        }
+    }
+
+    #[inline(always)]
+    unsafe fn set_unchecked(&self, index: usize, value: T)
+    where
+        T: Sized,
+    {
+        unsafe {
+            // Safety: the caller must guarantee that there are no data races
+            *self.get_mut_ptr_unchecked(index) = value
+        }
+    }
 }
 
 impl<T, I: PointerParSlice<T>> UnsafeDataRaceParSlice<T> for I {}
 
-pub trait UnsafeParSlice<T>: PointerParSlice<T> {
+pub trait UnsafeParSlice<T: ?Sized>: PointerParSlice<T> {
     #[inline(always)]
     unsafe fn get(&self, index: usize) -> &T {
         unsafe {
@@ -107,4 +135,4 @@ pub trait UnsafeParSlice<T>: PointerParSlice<T> {
     }
 }
 
-impl<T, I: PointerParSlice<T>> UnsafeParSlice<T> for I {}
+impl<T: ?Sized, I: PointerParSlice<T>> UnsafeParSlice<T> for I {}
