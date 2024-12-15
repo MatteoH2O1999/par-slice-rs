@@ -1,10 +1,14 @@
-use crate::{ParSliceView, PointerParSlice};
-use std::{cell::UnsafeCell, mem::size_of, ops::Deref};
+use crate::{IntoParSlice, ParSliceView, PointerParSlice};
+use std::{
+    cell::UnsafeCell,
+    mem::size_of,
+    ops::{Deref, DerefMut},
+};
 
 pub(crate) struct UnsafeCellSlice<B>(B);
 
 impl<T> UnsafeCellSlice<&UnsafeCell<[T]>> {
-    pub fn new_borrowed(slice: &mut [T]) -> Self {
+    fn new_borrowed(slice: &mut [T]) -> Self {
         // TODO: replace with UnsafeCell::from_mut when stable
         let ptr = slice as *mut [T] as *mut UnsafeCell<[T]>;
         let unsafe_slice = unsafe {
@@ -16,7 +20,7 @@ impl<T> UnsafeCellSlice<&UnsafeCell<[T]>> {
 }
 
 impl<T> UnsafeCellSlice<Box<UnsafeCell<[T]>>> {
-    pub unsafe fn new_owned(ptr: *mut [T]) -> Self {
+    unsafe fn new_owned(ptr: *mut [T]) -> Self {
         let ptr = ptr as *mut UnsafeCell<[T]>;
         let boxed = unsafe {
             // Safety: UnsafeCell is repr(transparent) and caller guarantees
@@ -79,7 +83,7 @@ impl<T> UnsafeCellChunkSlice<&UnsafeCell<[T]>> {
 }
 
 impl<T> UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {
-    fn new_owned(ptr: *mut [T], chunk_size: usize) -> Self {
+    unsafe fn new_owned(ptr: *mut [T], chunk_size: usize) -> Self {
         assert_eq!(ptr.len() % chunk_size, 0);
         let len = ptr.len() / chunk_size;
 
@@ -160,5 +164,64 @@ impl<T> ParSliceView<T> for [T] {
     #[inline(always)]
     fn as_unsafe_par_chunk_slice(&mut self, chunk_size: usize) -> impl crate::UnsafeParSlice<[T]> {
         UnsafeCellChunkSlice::new_borrowed(self, chunk_size)
+    }
+}
+
+impl<T, B: Deref<Target = [T]> + DerefMut> IntoParSlice<T> for B {
+    #[inline(always)]
+    fn into_pointer_par_slice(self) -> impl PointerParSlice<T> {
+        let mut manually_drop = std::mem::ManuallyDrop::new(self);
+        unsafe {
+            // Safety: pointer is now owned
+            UnsafeCellSlice::new_owned(manually_drop.deref_mut().deref_mut())
+        }
+    }
+
+    #[inline(always)]
+    fn into_data_race_par_slice(self) -> impl crate::UnsafeDataRaceParSlice<T> {
+        let mut manually_drop = std::mem::ManuallyDrop::new(self);
+        unsafe {
+            // Safety: pointer is now owned
+            UnsafeCellSlice::new_owned(manually_drop.deref_mut().deref_mut())
+        }
+    }
+
+    #[inline(always)]
+    fn into_unsafe_par_slice(self) -> impl crate::UnsafeParSlice<T> {
+        let mut manually_drop = std::mem::ManuallyDrop::new(self);
+        unsafe {
+            // Safety: pointer is now owned
+            UnsafeCellSlice::new_owned(manually_drop.deref_mut().deref_mut())
+        }
+    }
+
+    #[inline(always)]
+    fn into_pointer_par_chunk_slice(self, chunk_size: usize) -> impl PointerParSlice<[T]> {
+        let mut manually_drop = std::mem::ManuallyDrop::new(self);
+        unsafe {
+            // Safety: pointer is now owned
+            UnsafeCellChunkSlice::new_owned(manually_drop.deref_mut().deref_mut(), chunk_size)
+        }
+    }
+
+    #[inline(always)]
+    fn into_data_race_par_chunk_slice(
+        self,
+        chunk_size: usize,
+    ) -> impl crate::UnsafeDataRaceParChunkSlice<T> {
+        let mut manually_drop = std::mem::ManuallyDrop::new(self);
+        unsafe {
+            // Safety: pointer is now owned
+            UnsafeCellChunkSlice::new_owned(manually_drop.deref_mut().deref_mut(), chunk_size)
+        }
+    }
+
+    #[inline(always)]
+    fn into_unsafe_par_chunk_slice(self, chunk_size: usize) -> impl crate::UnsafeParSlice<[T]> {
+        let mut manually_drop = std::mem::ManuallyDrop::new(self);
+        unsafe {
+            // Safety: pointer is now owned
+            UnsafeCellChunkSlice::new_owned(manually_drop.deref_mut().deref_mut(), chunk_size)
+        }
     }
 }
