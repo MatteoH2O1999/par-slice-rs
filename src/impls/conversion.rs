@@ -1,5 +1,18 @@
 use crate::*;
 
+#[inline(always)]
+fn assert_chunk_size(len: usize, chunk_size: usize) {
+    assert_eq!(
+        len % chunk_size,
+        0,
+        "chunk_size should be a divisor of len. {} / {} = {} with a remainder of {}",
+        len,
+        chunk_size,
+        len / chunk_size,
+        len % chunk_size
+    )
+}
+
 impl<T: Sync> ParSliceView<T> for [T] {
     #[inline(always)]
     fn as_pointer_par_slice(&mut self) -> impl PointerParSlice<T> + Sync {
@@ -21,6 +34,7 @@ impl<T: Sync> ParSliceView<T> for [T] {
         &mut self,
         chunk_size: usize,
     ) -> impl PointerParSlice<[T]> + Sync {
+        assert_chunk_size(self.len(), chunk_size);
         UnsafeCellChunkSlice::new_borrowed(self, chunk_size)
     }
 
@@ -29,11 +43,13 @@ impl<T: Sync> ParSliceView<T> for [T] {
         &mut self,
         chunk_size: usize,
     ) -> impl UnsafeDataRaceParChunkSlice<T> + Sync {
+        assert_chunk_size(self.len(), chunk_size);
         UnsafeCellChunkSlice::new_borrowed(self, chunk_size)
     }
 
     #[inline(always)]
     fn as_unsafe_par_chunk_slice(&mut self, chunk_size: usize) -> impl UnsafeParSlice<[T]> + Sync {
+        assert_chunk_size(self.len(), chunk_size);
         UnsafeCellChunkSlice::new_borrowed(self, chunk_size)
     }
 }
@@ -71,6 +87,7 @@ impl<T: Sync> IntoParSlice<T> for Box<[T]> {
         self,
         chunk_size: usize,
     ) -> impl PointerParSlice<[T]> + Into<Box<[T]>> + Sync {
+        assert_chunk_size(self.len(), chunk_size);
         let ptr = Box::into_raw(self);
         unsafe {
             // Safety: pointer is now owned
@@ -83,6 +100,7 @@ impl<T: Sync> IntoParSlice<T> for Box<[T]> {
         self,
         chunk_size: usize,
     ) -> impl UnsafeDataRaceParChunkSlice<T> + Into<Box<[T]>> + Sync {
+        assert_chunk_size(self.len(), chunk_size);
         let ptr = Box::into_raw(self);
         unsafe {
             // Safety: pointer is now owned
@@ -95,6 +113,7 @@ impl<T: Sync> IntoParSlice<T> for Box<[T]> {
         self,
         chunk_size: usize,
     ) -> impl UnsafeParSlice<[T]> + Into<Box<[T]>> + Sync {
+        assert_chunk_size(self.len(), chunk_size);
         let ptr = Box::into_raw(self);
         unsafe {
             // Safety: pointer is now owned
@@ -124,6 +143,7 @@ impl<T: Sync> IntoParSlice<T> for Vec<T> {
         self,
         chunk_size: usize,
     ) -> impl PointerParSlice<[T]> + Into<Box<[T]>> + Sync {
+        assert_chunk_size(self.len(), chunk_size);
         self.into_boxed_slice()
             .into_pointer_par_chunk_slice(chunk_size)
     }
@@ -133,6 +153,7 @@ impl<T: Sync> IntoParSlice<T> for Vec<T> {
         self,
         chunk_size: usize,
     ) -> impl UnsafeDataRaceParChunkSlice<T> + Into<Box<[T]>> + Sync {
+        assert_chunk_size(self.len(), chunk_size);
         self.into_boxed_slice()
             .into_data_race_par_chunk_slice(chunk_size)
     }
@@ -142,6 +163,7 @@ impl<T: Sync> IntoParSlice<T> for Vec<T> {
         self,
         chunk_size: usize,
     ) -> impl UnsafeParSlice<[T]> + Into<Box<[T]>> + Sync {
+        assert_chunk_size(self.len(), chunk_size);
         self.into_boxed_slice()
             .into_unsafe_par_chunk_slice(chunk_size)
     }
