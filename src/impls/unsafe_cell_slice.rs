@@ -29,11 +29,10 @@ impl<T> UnsafeCellSlice<&UnsafeCell<[T]>> {
 }
 
 impl<T> UnsafeCellSlice<Box<UnsafeCell<[T]>>> {
-    pub(crate) unsafe fn new_owned(ptr: *mut [T]) -> Self {
-        let ptr = ptr as *mut UnsafeCell<[T]>;
+    pub(crate) fn new_owned(slice: Box<[T]>) -> Self {
+        let ptr = Box::into_raw(slice) as *mut UnsafeCell<[T]>;
         let boxed = unsafe {
-            // Safety: UnsafeCell is repr(transparent) and caller guarantees
-            // ownership of the allocation pointed to by ptr
+            // Safety: UnsafeCell is repr(transparent)
             Box::from_raw(ptr)
         };
         Self(boxed)
@@ -104,14 +103,13 @@ impl<T> UnsafeCellChunkSlice<&UnsafeCell<[T]>> {
 }
 
 impl<T> UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {
-    pub(crate) unsafe fn new_owned(ptr: *mut [T], chunk_size: usize) -> Self {
-        assert_eq!(ptr.len() % chunk_size, 0);
-        let len = ptr.len() / chunk_size;
+    pub(crate) fn new_owned(slice: Box<[T]>, chunk_size: usize) -> Self {
+        assert_eq!(slice.len() % chunk_size, 0);
+        let len = slice.len() / chunk_size;
 
-        let ptr = ptr as *mut UnsafeCell<[T]>;
+        let ptr = Box::into_raw(slice) as *mut UnsafeCell<[T]>;
         let boxed = unsafe {
-            // Safety: UnsafeCell is repr(transparent) and caller guarantees
-            // ownership of the allocation pointed to by ptr
+            // Safety: UnsafeCell is repr(transparent)
             Box::from_raw(ptr)
         };
 
