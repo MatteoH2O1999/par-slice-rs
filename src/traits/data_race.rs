@@ -68,11 +68,9 @@ pub trait UnsafeDataRaceParSlice<T: ?Sized>: PointerParSlice<T> {
     }
 }
 
-impl<T, I: PointerParSlice<T>> UnsafeDataRaceParSlice<T> for I {}
-
 pub trait UnsafeDataRaceParChunkSlice<T>: PointerParSlice<[T]> {
     #[inline(always)]
-    unsafe fn get_chunk(&self, index: usize) -> Box<[T]>
+    unsafe fn get(&self, index: usize) -> Box<[T]>
     where
         T: Clone,
     {
@@ -98,7 +96,7 @@ pub trait UnsafeDataRaceParChunkSlice<T>: PointerParSlice<[T]> {
     }
 
     #[inline(always)]
-    unsafe fn get_chunk_unchecked(&self, index: usize) -> Box<[T]>
+    unsafe fn get_unchecked(&self, index: usize) -> Box<[T]>
     where
         T: Clone,
     {
@@ -124,7 +122,7 @@ pub trait UnsafeDataRaceParChunkSlice<T>: PointerParSlice<[T]> {
     }
 
     #[inline(always)]
-    unsafe fn set_chunk(&self, index: usize, value: &[T])
+    unsafe fn set(&self, index: usize, value: &[T])
     where
         T: Clone,
     {
@@ -145,7 +143,7 @@ pub trait UnsafeDataRaceParChunkSlice<T>: PointerParSlice<[T]> {
     }
 
     #[inline(always)]
-    unsafe fn set_chunk_unchecked(&self, index: usize, value: &[T])
+    unsafe fn set_unchecked(&self, index: usize, value: &[T])
     where
         T: Clone,
     {
@@ -165,5 +163,3 @@ pub trait UnsafeDataRaceParChunkSlice<T>: PointerParSlice<[T]> {
         }
     }
 }
-
-impl<T, I: PointerParSlice<[T]>> UnsafeDataRaceParChunkSlice<T> for I {}

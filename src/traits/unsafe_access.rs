@@ -41,5 +41,3 @@ pub trait UnsafeParSlice<T: ?Sized>: PointerParSlice<T> {
         }
     }
 }
-
-impl<T: ?Sized, I: PointerParSlice<T>> UnsafeParSlice<T> for I {}

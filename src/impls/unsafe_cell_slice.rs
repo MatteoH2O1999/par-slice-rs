@@ -64,6 +64,9 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerParSlice<T> for Unsafe
     }
 }
 
+impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceParSlice<T> for UnsafeCellSlice<B> {}
+impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeParSlice<T> for UnsafeCellSlice<B> {}
+
 pub(crate) struct UnsafeCellChunkSlice<B> {
     inner: B,
     len: usize,
@@ -150,3 +153,9 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerParSlice<[T]>
         self.len
     }
 }
+
+impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceParChunkSlice<T>
+    for UnsafeCellChunkSlice<B>
+{
+}
+impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeParSlice<[T]> for UnsafeCellChunkSlice<B> {}
