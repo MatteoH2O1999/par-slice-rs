@@ -1,7 +1,7 @@
 use crate::*;
 
 #[inline(always)]
-fn assert_chunk_size(len: usize, chunk_size: usize) {
+pub(crate) fn assert_chunk_size(len: usize, chunk_size: usize) {
     assert_eq!(
         len % chunk_size,
         0,
