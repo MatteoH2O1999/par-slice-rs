@@ -7,9 +7,7 @@ use std::thread::scope;
 
 #[test]
 fn no_thread_unchecked() {
-    let v = vec![1, 2, 3];
-
-    let slice = v.into_pointer_par_slice();
+    let slice = vec![1, 2, 3].into_pointer_par_slice();
 
     {
         assert_eq!(unsafe { *slice.get_ptr_unchecked(1) }, 2);
@@ -23,9 +21,7 @@ fn no_thread_unchecked() {
 
 #[test]
 fn no_thread_checked() {
-    let v = vec![1, 2, 3];
-
-    let slice = v.into_pointer_par_slice();
+    let slice = vec![1, 2, 3].into_pointer_par_slice();
 
     {
         assert_eq!(unsafe { *slice.get_ptr(1) }, 2);
@@ -40,9 +36,7 @@ fn no_thread_checked() {
 #[test]
 #[should_panic(expected = "Index 42 invalid for slice of len 3")]
 fn no_thread_checked_panic() {
-    let v = vec![1, 2, 3];
-
-    let slice = v.into_pointer_par_slice();
+    let slice = vec![1, 2, 3].into_pointer_par_slice();
 
     {
         slice.get_ptr(42);
@@ -52,9 +46,7 @@ fn no_thread_checked_panic() {
 #[test]
 #[should_panic(expected = "Index 69 invalid for slice of len 3")]
 fn no_thread_checked_panic_mut() {
-    let v = vec![1, 2, 3];
-
-    let slice = v.into_pointer_par_slice();
+    let slice = vec![1, 2, 3].into_pointer_par_slice();
 
     {
         slice.get_ptr(69);
@@ -67,9 +59,7 @@ fn no_thread_checked_panic_mut() {
 
 #[test]
 fn single_thread_unchecked() {
-    let v = vec![1, 2, 3];
-
-    let slice = v.into_pointer_par_slice();
+    let slice = vec![1, 2, 3].into_pointer_par_slice();
 
     {
         scope(|s| {
@@ -91,9 +81,7 @@ fn single_thread_unchecked() {
 
 #[test]
 fn single_thread_checked() {
-    let v = vec![1, 2, 3];
-
-    let slice = v.into_pointer_par_slice();
+    let slice = vec![1, 2, 3].into_pointer_par_slice();
 
     {
         scope(|s| {
@@ -115,10 +103,7 @@ fn single_thread_checked() {
 
 #[test]
 fn single_thread_checked_panic() {
-    let v = vec![1, 2, 3];
-
-    let slice = v.into_pointer_par_slice();
-
+    let slice = vec![1, 2, 3].into_pointer_par_slice();
     {
         scope(|s| {
             s.spawn(|| {
@@ -139,9 +124,7 @@ fn single_thread_checked_panic() {
 
 #[test]
 fn single_thread_checked_panic_mut() {
-    let v = vec![1, 2, 3];
-
-    let slice = v.into_pointer_par_slice();
+    let slice = vec![1, 2, 3].into_pointer_par_slice();
 
     {
         scope(|s| {
@@ -167,9 +150,7 @@ fn single_thread_checked_panic_mut() {
 
 #[test]
 fn multithread_unchecked() {
-    let v = vec![1, 2, 3];
-
-    let slice = v.into_pointer_par_slice();
+    let slice = vec![1, 2, 3].into_pointer_par_slice();
 
     {
         scope(|s| {
@@ -187,9 +168,7 @@ fn multithread_unchecked() {
 
 #[test]
 fn multithread_checked() {
-    let v = vec![1, 2, 3];
-
-    let slice = v.into_pointer_par_slice();
+    let slice = vec![1, 2, 3].into_pointer_par_slice();
 
     {
         scope(|s| {
@@ -207,9 +186,7 @@ fn multithread_checked() {
 
 #[test]
 fn multithread_checked_panic() {
-    let v = vec![1, 2, 3];
-
-    let slice = v.into_pointer_par_slice();
+    let slice = vec![1, 2, 3].into_pointer_par_slice();
 
     {
         scope(|s| {
@@ -229,9 +206,7 @@ fn multithread_checked_panic() {
 
 #[test]
 fn multithread_checked_panic_mut() {
-    let v = vec![1, 2, 3];
-
-    let slice = v.into_pointer_par_slice();
+    let slice = vec![1, 2, 3].into_pointer_par_slice();
 
     {
         scope(|s| {
