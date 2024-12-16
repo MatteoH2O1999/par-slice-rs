@@ -12,13 +12,23 @@ pub unsafe trait PointerParSlice<T: ?Sized> {
 
     #[inline(always)]
     fn get_ptr(&self, index: usize) -> *const T {
-        assert!(index < self.len());
+        assert!(
+            index < self.len(),
+            "Index {} invalid for slice of len {}",
+            index,
+            self.len()
+        );
         self.get_ptr_unchecked(index)
     }
 
     #[inline(always)]
     fn get_mut_ptr(&self, index: usize) -> *mut T {
-        assert!(index < self.len());
+        assert!(
+            index < self.len(),
+            "Index {} invalid for slice of len {}",
+            index,
+            self.len()
+        );
         self.get_mut_ptr_unchecked(index)
     }
 }

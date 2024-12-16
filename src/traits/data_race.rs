@@ -86,7 +86,7 @@ pub trait UnsafeDataRaceParChunkSlice<T>: PointerParSlice<[T]> {
                 // Safety: the caller must guarantee that there are no data races
                 elem.write((*ptr).clone());
 
-                // Safety: size_of::<T>() is < isize::MAX
+                // Safety: size_of::<T>() is < isize::MAX as it is allocated
                 ptr = ptr.add(1);
             }
         }
@@ -112,7 +112,7 @@ pub trait UnsafeDataRaceParChunkSlice<T>: PointerParSlice<[T]> {
                 // Safety: the caller must guarantee that there are no data races
                 elem.write((*ptr).clone());
 
-                // Safety: size_of::<T>() is < isize::MAX
+                // Safety: size_of::<T>() is < isize::MAX as it is allocated
                 ptr = ptr.add(1);
             }
         }
@@ -138,7 +138,7 @@ pub trait UnsafeDataRaceParChunkSlice<T>: PointerParSlice<[T]> {
                 // Safety: the caller must guarantee that there are no data races
                 *ptr = elem.clone();
 
-                // Safety: size_of::<T>() is < isize::MAX
+                // Safety: size_of::<T>() is < isize::MAX as it is allocated
                 ptr = ptr.add(1);
             }
         }
@@ -159,7 +159,7 @@ pub trait UnsafeDataRaceParChunkSlice<T>: PointerParSlice<[T]> {
                 // Safety: the caller must guarantee that there are no data races
                 *ptr = elem.clone();
 
-                // Safety: size_of::<T>() is < isize::MAX
+                // Safety: size_of::<T>() is < isize::MAX as it is allocated
                 ptr = ptr.add(1);
             }
         }
