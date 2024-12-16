@@ -155,7 +155,7 @@ impl ParSlice {
         value: T,
         len: usize,
         chunk_size: usize,
-    ) -> impl UnsafeDataRaceParChunkSlice<T> + Into<Box<[T]>> + Sync {
+    ) -> impl UnsafeParSlice<[T]> + Into<Box<[T]>> + Sync {
         assert_eq!(len % chunk_size, 0);
         let mut boxed = Box::new_uninit_slice(len);
         for elem in boxed.iter_mut() {
