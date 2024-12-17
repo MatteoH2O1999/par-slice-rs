@@ -91,5 +91,137 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerParSlice<[T]>
 impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceParChunkSlice<T>
     for UnsafeCellChunkSlice<B>
 {
+    #[inline(always)]
+    unsafe fn get(&self, index: usize) -> Box<[T]>
+    where
+        T: Copy,
+    {
+        let fat_ptr = self.get_ptr(index);
+
+        let mut res = Box::new_uninit_slice(fat_ptr.len());
+        let mut ptr = fat_ptr as *const T;
+
+        for elem in res.iter_mut() {
+            unsafe {
+                // Safety: the caller must guarantee that there are no data races
+                elem.write(*ptr);
+
+                // Safety: size_of::<T>() is < isize::MAX as it is allocated
+                ptr = ptr.add(1);
+            }
+        }
+
+        unsafe {
+            // Safety: the slice is filled with the correct elements
+            res.assume_init()
+        }
+    }
+
+    #[inline(always)]
+    unsafe fn get_unchecked(&self, index: usize) -> Box<[T]>
+    where
+        T: Copy,
+    {
+        let fat_ptr = self.get_ptr_unchecked(index);
+
+        let mut res = Box::new_uninit_slice(fat_ptr.len());
+        let mut ptr = fat_ptr as *const T;
+
+        for elem in res.iter_mut() {
+            unsafe {
+                // Safety: the caller must guarantee that there are no data races
+                elem.write(*ptr);
+
+                // Safety: size_of::<T>() is < isize::MAX as it is allocated
+                ptr = ptr.add(1);
+            }
+        }
+
+        unsafe {
+            // Safety: the slice is filled with the correct elements
+            res.assume_init()
+        }
+    }
+
+    #[inline(always)]
+    unsafe fn set(&self, index: usize, value: &[T])
+    where
+        T: Clone,
+    {
+        let fat_ptr = self.get_mut_ptr(index);
+        assert_eq!(value.len(), fat_ptr.len());
+
+        let mut ptr = fat_ptr as *mut T;
+
+        for elem in value.iter() {
+            unsafe {
+                // Safety: the caller must guarantee that there are no data races
+                *ptr = elem.clone();
+
+                // Safety: size_of::<T>() is < isize::MAX as it is allocated
+                ptr = ptr.add(1);
+            }
+        }
+    }
+
+    #[inline(always)]
+    unsafe fn set_unchecked(&self, index: usize, value: &[T])
+    where
+        T: Clone,
+    {
+        let fat_ptr = self.get_mut_ptr_unchecked(index);
+        debug_assert_eq!(value.len(), fat_ptr.len());
+
+        let mut ptr = fat_ptr as *mut T;
+
+        for elem in value.iter() {
+            unsafe {
+                // Safety: the caller must guarantee that there are no data races
+                *ptr = elem.clone();
+
+                // Safety: size_of::<T>() is < isize::MAX as it is allocated
+                ptr = ptr.add(1);
+            }
+        }
+    }
 }
-impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeParSlice<[T]> for UnsafeCellChunkSlice<B> {}
+
+impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeParSlice<[T]> for UnsafeCellChunkSlice<B> {
+    #[inline(always)]
+    unsafe fn get(&self, index: usize) -> &[T] {
+        unsafe {
+            // Safety: the caller must guarantee not to modify the memory pointed
+            // by this reference for the duration of its lifetime and not to create
+            // a &mut reference with `get_mut`
+            &*self.get_ptr(index)
+        }
+    }
+
+    #[inline(always)]
+    unsafe fn get_unchecked(&self, index: usize) -> &[T] {
+        unsafe {
+            // Safety: the caller must guarantee not to modify the memory pointed
+            // by this reference for the duration of its lifetime and not to create
+            // a &mut reference with `get_mut`
+            &*self.get_ptr_unchecked(index)
+        }
+    }
+
+    #[inline(always)]
+    unsafe fn get_mut(&self, index: usize) -> &mut [T] {
+        unsafe {
+            // Safety: the caller must guarantee that no other references with the same index
+            // exists for the duration of the returned reference
+            &mut *self.get_mut_ptr(index)
+        }
+    }
+
+    #[inline(always)]
+    unsafe fn get_mut_unchecked(&self, index: usize) -> &mut [T] {
+        unsafe {
+            // Safety: the caller must guarantee that no other references with the same index
+            // exists for the duration of the returned reference
+            &mut *self.get_mut_ptr_unchecked(index)
+        }
+    }
+}

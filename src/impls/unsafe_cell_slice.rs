@@ -64,5 +64,88 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerParSlice<T> for Unsafe
     }
 }
 
-impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceParSlice<T> for UnsafeCellSlice<B> {}
-impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeParSlice<T> for UnsafeCellSlice<B> {}
+impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceParSlice<T> for UnsafeCellSlice<B> {
+    #[inline(always)]
+    unsafe fn get(&self, index: usize) -> T
+    where
+        T: Copy,
+    {
+        unsafe {
+            // Safety: the caller must guarantee that there are no data races
+            *self.get_ptr(index)
+        }
+    }
+
+    #[inline(always)]
+    unsafe fn get_unchecked(&self, index: usize) -> T
+    where
+        T: Copy,
+    {
+        unsafe {
+            // Safety: the caller must guarantee that there are no data races
+            *self.get_ptr_unchecked(index)
+        }
+    }
+
+    #[inline(always)]
+    unsafe fn set(&self, index: usize, value: T)
+    where
+        T: Sized,
+    {
+        unsafe {
+            // Safety: the caller must guarantee that there are no data races
+            *self.get_mut_ptr(index) = value
+        }
+    }
+
+    #[inline(always)]
+    unsafe fn set_unchecked(&self, index: usize, value: T)
+    where
+        T: Sized,
+    {
+        unsafe {
+            // Safety: the caller must guarantee that there are no data races
+            *self.get_mut_ptr_unchecked(index) = value
+        }
+    }
+}
+
+impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeParSlice<T> for UnsafeCellSlice<B> {
+    #[inline(always)]
+    unsafe fn get(&self, index: usize) -> &T {
+        unsafe {
+            // Safety: the caller must guarantee not to modify the memory pointed
+            // by this reference for the duration of its lifetime and not to create
+            // a &mut reference with `get_mut`
+            &*self.get_ptr(index)
+        }
+    }
+
+    #[inline(always)]
+    unsafe fn get_unchecked(&self, index: usize) -> &T {
+        unsafe {
+            // Safety: the caller must guarantee not to modify the memory pointed
+            // by this reference for the duration of its lifetime and not to create
+            // a &mut reference with `get_mut`
+            &*self.get_ptr_unchecked(index)
+        }
+    }
+
+    #[inline(always)]
+    unsafe fn get_mut(&self, index: usize) -> &mut T {
+        unsafe {
+            // Safety: the caller must guarantee that no other references with the same index
+            // exists for the duration of the returned reference
+            &mut *self.get_mut_ptr(index)
+        }
+    }
+
+    #[inline(always)]
+    unsafe fn get_mut_unchecked(&self, index: usize) -> &mut T {
+        unsafe {
+            // Safety: the caller must guarantee that no other references with the same index
+            // exists for the duration of the returned reference
+            &mut *self.get_mut_ptr_unchecked(index)
+        }
+    }
+}
