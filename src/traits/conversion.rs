@@ -1,42 +1,41 @@
 use super::*;
 
 pub trait ParSliceView<T> {
-    fn as_pointer_par_slice(&mut self) -> impl PointerParSlice<T> + Sync;
+    fn as_pointer_par_slice(&mut self) -> impl PointerAccess<T> + Sync;
 
-    fn as_data_race_par_slice(&mut self) -> impl UnsafeDataRaceParSlice<T> + Sync;
+    fn as_data_race_par_slice(&mut self) -> impl UnsafeDataRaceAccess<T> + Sync;
 
-    fn as_unsafe_par_slice(&mut self) -> impl UnsafeParSlice<T> + Sync;
+    fn as_unsafe_par_slice(&mut self) -> impl UnsafeAccess<T> + Sync;
 
-    fn as_pointer_par_chunk_slice(&mut self, chunk_size: usize)
-        -> impl PointerParSlice<[T]> + Sync;
+    fn as_pointer_par_chunk_slice(&mut self, chunk_size: usize) -> impl PointerAccess<[T]> + Sync;
 
     fn as_data_race_par_chunk_slice(
         &mut self,
         chunk_size: usize,
-    ) -> impl UnsafeDataRaceParChunkSlice<T> + Sync;
+    ) -> impl UnsafeDataRaceChunkAccess<T> + Sync;
 
-    fn as_unsafe_par_chunk_slice(&mut self, chunk_size: usize) -> impl UnsafeParSlice<[T]> + Sync;
+    fn as_unsafe_par_chunk_slice(&mut self, chunk_size: usize) -> impl UnsafeAccess<[T]> + Sync;
 }
 
 pub trait IntoParSlice<T> {
-    fn into_pointer_par_slice(self) -> impl PointerParSlice<T> + Into<Box<[T]>> + Sync;
+    fn into_pointer_par_slice(self) -> impl PointerAccess<T> + Into<Box<[T]>> + Sync;
 
-    fn into_data_race_par_slice(self) -> impl UnsafeDataRaceParSlice<T> + Into<Box<[T]>> + Sync;
+    fn into_data_race_par_slice(self) -> impl UnsafeDataRaceAccess<T> + Into<Box<[T]>> + Sync;
 
-    fn into_unsafe_par_slice(self) -> impl UnsafeParSlice<T> + Into<Box<[T]>> + Sync;
+    fn into_unsafe_par_slice(self) -> impl UnsafeAccess<T> + Into<Box<[T]>> + Sync;
 
     fn into_pointer_par_chunk_slice(
         self,
         chunk_size: usize,
-    ) -> impl PointerParSlice<[T]> + Into<Box<[T]>> + Sync;
+    ) -> impl PointerAccess<[T]> + Into<Box<[T]>> + Sync;
 
     fn into_data_race_par_chunk_slice(
         self,
         chunk_size: usize,
-    ) -> impl UnsafeDataRaceParChunkSlice<T> + Into<Box<[T]>> + Sync;
+    ) -> impl UnsafeDataRaceChunkAccess<T> + Into<Box<[T]>> + Sync;
 
     fn into_unsafe_par_chunk_slice(
         self,
         chunk_size: usize,
-    ) -> impl UnsafeParSlice<[T]> + Into<Box<[T]>> + Sync;
+    ) -> impl UnsafeAccess<[T]> + Into<Box<[T]>> + Sync;
 }

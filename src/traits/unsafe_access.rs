@@ -1,4 +1,4 @@
-pub trait UnsafeParSlice<T: ?Sized> {
+pub trait UnsafeAccess<T: ?Sized> {
     unsafe fn get(&self, index: usize) -> &T;
 
     unsafe fn get_unchecked(&self, index: usize) -> &T;

@@ -1,4 +1,4 @@
-pub trait UnsafeDataRaceParSlice<T: ?Sized> {
+pub trait UnsafeDataRaceAccess<T: ?Sized> {
     unsafe fn get(&self, index: usize) -> T
     where
         T: Copy;
@@ -16,7 +16,7 @@ pub trait UnsafeDataRaceParSlice<T: ?Sized> {
         T: Sized;
 }
 
-pub trait UnsafeDataRaceParChunkSlice<T> {
+pub trait UnsafeDataRaceChunkAccess<T> {
     unsafe fn get(&self, index: usize) -> Box<[T]>
     where
         T: Copy;

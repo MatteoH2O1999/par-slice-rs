@@ -39,7 +39,7 @@ impl<T> UnsafeCellSlice<Box<UnsafeCell<[T]>>> {
     }
 }
 
-unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerParSlice<T> for UnsafeCellSlice<B> {
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerAccess<T> for UnsafeCellSlice<B> {
     #[inline(always)]
     fn get_ptr_unchecked(&self, index: usize) -> *const T {
         self.get_mut_ptr_unchecked(index) as *const T
@@ -64,7 +64,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerParSlice<T> for Unsafe
     }
 }
 
-impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceParSlice<T> for UnsafeCellSlice<B> {
+impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceAccess<T> for UnsafeCellSlice<B> {
     #[inline(always)]
     unsafe fn get(&self, index: usize) -> T
     where
@@ -110,7 +110,7 @@ impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceParSlice<T> for Unsafe
     }
 }
 
-impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeParSlice<T> for UnsafeCellSlice<B> {
+impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeAccess<T> for UnsafeCellSlice<B> {
     #[inline(always)]
     unsafe fn get(&self, index: usize) -> &T {
         unsafe {
