@@ -99,7 +99,7 @@ fn single_thread_checked_panic_get() {
 
     scope(|s| {
         s.spawn(|| {
-            assert_eq!(unsafe { slice.get(42) }, 2);
+            unsafe { slice.get(42) };
         })
         .join()
         .unwrap_err();
@@ -178,7 +178,7 @@ fn multithread_checked_panic_get() {
             unsafe { slice.set(2, 42) };
         });
         s.spawn(|| {
-            assert_eq!(unsafe { slice.get(42) }, 2);
+            unsafe { slice.get(42) };
         })
         .join()
         .unwrap_err();

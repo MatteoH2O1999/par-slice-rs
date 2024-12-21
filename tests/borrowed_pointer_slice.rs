@@ -115,7 +115,7 @@ fn single_thread_checked_panic() {
         let slice = v.as_pointer_par_slice();
         scope(|s| {
             s.spawn(|| {
-                assert_eq!(unsafe { *slice.get_ptr(42) }, 2);
+                slice.get_ptr(42);
             })
             .join()
             .unwrap_err();
@@ -206,7 +206,7 @@ fn multithread_checked_panic() {
                 unsafe { *slice.get_mut_ptr(2) = 42 };
             });
             s.spawn(|| {
-                assert_eq!(unsafe { *slice.get_ptr(42) }, 2);
+                slice.get_ptr(42);
             })
             .join()
             .unwrap_err();
