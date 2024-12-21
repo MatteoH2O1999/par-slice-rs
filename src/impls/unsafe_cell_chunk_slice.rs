@@ -147,7 +147,12 @@ impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceChunkAccess<T>
         T: Clone,
     {
         let fat_ptr = self.get_mut_ptr(index);
-        assert_eq!(value.len(), fat_ptr.len());
+        assert!(
+            value.len() == fat_ptr.len(),
+            "value should have the same length as the chunk. Got a value of length {} for a chunk of length {}",
+            value.len(),
+            fat_ptr.len()
+        );
 
         let mut ptr = fat_ptr as *mut T;
 

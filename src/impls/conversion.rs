@@ -2,9 +2,8 @@ use crate::*;
 
 #[inline(always)]
 pub(crate) fn assert_chunk_size(len: usize, chunk_size: usize) {
-    assert_eq!(
-        len % chunk_size,
-        0,
+    assert!(
+        len % chunk_size == 0,
         "chunk_size should be a divisor of len. {} / {} = {} with a remainder of {}",
         len,
         chunk_size,
