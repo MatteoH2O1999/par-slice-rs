@@ -3,6 +3,7 @@ use crate::{constructor::*, *};
 pub struct PointerParSlice;
 
 impl PointerParSlice {
+    #[allow(clippy::new_ret_no_self)]
     #[inline(always)]
     pub fn new<T: Default + Sync>(len: usize) -> impl PointerAccess<T> + Into<Box<[T]>> + Sync {
         new_boxed_slice(len).into_pointer_par_slice()

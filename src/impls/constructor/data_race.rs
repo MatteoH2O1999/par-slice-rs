@@ -3,6 +3,7 @@ use crate::{constructor::*, *};
 pub struct DataRaceSlice;
 
 impl DataRaceSlice {
+    #[allow(clippy::new_ret_no_self)]
     #[inline(always)]
     pub fn new<T: Default + Sync>(
         len: usize,
