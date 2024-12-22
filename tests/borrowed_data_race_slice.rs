@@ -77,8 +77,8 @@ fn single_thread_unchecked() {
             })
             .join()
             .unwrap();
-            s.spawn(|| unsafe {
-                slice.set_unchecked(2, 42);
+            s.spawn(|| {
+                unsafe { slice.set_unchecked(2, 42) };
             })
             .join()
             .unwrap();
@@ -100,8 +100,8 @@ fn single_thread_checked() {
             })
             .join()
             .unwrap();
-            s.spawn(|| unsafe {
-                slice.set(2, 42);
+            s.spawn(|| {
+                unsafe { slice.set(2, 42) };
             })
             .join()
             .unwrap();
@@ -171,8 +171,8 @@ fn multithread_unchecked() {
             s.spawn(|| {
                 assert_eq!(unsafe { slice.get_unchecked(1) }, 2);
             });
-            s.spawn(|| unsafe {
-                slice.set_unchecked(2, 42);
+            s.spawn(|| {
+                unsafe { slice.set_unchecked(2, 42) };
             });
         });
     }
@@ -190,8 +190,8 @@ fn multithread_checked() {
             s.spawn(|| {
                 assert_eq!(unsafe { slice.get(1) }, 2);
             });
-            s.spawn(|| unsafe {
-                slice.set(2, 42);
+            s.spawn(|| {
+                unsafe { slice.set(2, 42) };
             });
         });
     }
