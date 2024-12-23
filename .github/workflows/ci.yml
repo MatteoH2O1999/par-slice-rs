@@ -98,7 +98,9 @@ jobs:
           profile: minimal
           components: miri
       - name: Build tests
-        run: cargo miri setup
+        run: |
+          cargo miri setup
+          cargo test --no-run
       - name: Run tests
         run: cargo miri test
 
