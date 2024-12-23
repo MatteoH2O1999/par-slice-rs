@@ -9,6 +9,3 @@ license = "MIT"
 keywords = ["slice", "par", "parallel", "access", "concurrent"]
 categories = ["concurrency"]
 rust-version = "1.82"
-
-[dev-dependencies]
-rayon = "1.10.0"

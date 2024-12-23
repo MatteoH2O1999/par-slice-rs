@@ -1,9 +1,11 @@
 use par_slice::*;
-use rayon::prelude::*;
-use std::sync::{
-    atomic::{AtomicBool, Ordering},
-    Mutex,
+use std::{
+    sync::{atomic::*, Mutex},
+    thread::scope,
 };
+
+const NUM_THRREADS: usize = 4;
+const TREE_DEPTHS: &[u32] = &[2, 3, 4, 5, 6, 7, 8];
 
 struct Tree {
     successors: Vec<Vec<usize>>,
@@ -35,132 +37,121 @@ impl Tree {
     fn successors(&self, node: usize) -> &[usize] {
         self.successors[node].as_slice()
     }
+
+    fn num_nodes(&self) -> usize {
+        self.successors.len()
+    }
+}
+
+fn bfs(graph: Tree, closure: impl Fn(usize, isize) + Sync) {
+    let visited = (0..graph.num_nodes())
+        .into_iter()
+        .map(|i| AtomicBool::new(i == 0))
+        .collect::<Vec<_>>();
+    let mut current_frontier = vec![0];
+    let next_frontier = Mutex::new(Vec::new());
+    let mut current_dist = 0;
+    let cursor = AtomicUsize::new(0);
+
+    while !current_frontier.is_empty() {
+        cursor.store(0, Ordering::Relaxed);
+        scope(|s| {
+            for _ in 0..NUM_THRREADS {
+                s.spawn(|| {
+                    while let Some(&node) =
+                        current_frontier.get(cursor.fetch_add(1, Ordering::Relaxed))
+                    {
+                        closure(node, current_dist);
+
+                        for &succ in graph.successors(node) {
+                            if !visited[succ].swap(true, Ordering::Relaxed) {
+                                next_frontier.lock().unwrap().push(succ);
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        current_dist += 1;
+        current_frontier.clear();
+        std::mem::swap(&mut current_frontier, &mut next_frontier.lock().unwrap());
+    }
+}
+
+fn expected_dists(depth: u32) -> Vec<isize> {
+    let mut v = Vec::new();
+    for i in 0..depth {
+        for _ in 0..2_usize.pow(i) {
+            v.push(i.try_into().unwrap());
+        }
+    }
+    v
 }
 
 #[test]
 fn test_pointer_bfs() {
-    let graph = Tree::new(4);
+    for &depth in TREE_DEPTHS {
+        let tree = Tree::new(depth);
+        let mut dists = vec![-1; tree.num_nodes()];
 
-    let visited = (0..15)
-        .into_iter()
-        .map(|i| AtomicBool::new(i == 0))
-        .collect::<Vec<_>>();
-    let mut dists = vec![-1; 15];
-
-    let mut current_frontier = vec![0];
-    let next_frontier = Mutex::new(Vec::new());
-    let mut current_dist = 0;
-
-    {
-        let dists = dists.as_pointer_par_slice();
-        while !current_frontier.is_empty() {
-            current_frontier.par_iter().for_each(|&node| {
-                // Update dist value
+        {
+            let dists = dists.as_pointer_par_slice();
+            bfs(tree, |node, dist| {
                 let dist_ptr = dists.get_mut_ptr_unchecked(node);
                 unsafe {
                     // Safety: each node is accessed exactly once because of
                     // AtomicBool::swap so no data races can happen
                     // and node is always < dists.len() by construction
-                    *dist_ptr = current_dist;
-                }
-
-                // Enumerate successors for next frontier
-                for &succ in graph.successors(node) {
-                    if !visited[succ].swap(true, Ordering::Relaxed) {
-                        next_frontier.lock().unwrap().push(succ);
-                    }
+                    *dist_ptr = dist
                 }
             });
-            current_dist += 1;
-            current_frontier.clear();
-            std::mem::swap(&mut current_frontier, &mut next_frontier.lock().unwrap());
         }
-    }
 
-    assert_eq!(dists, vec![0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]);
+        assert_eq!(dists, expected_dists(depth));
+    }
 }
 
 #[test]
 fn test_data_race_bfs() {
-    let graph = Tree::new(4);
+    for &depth in TREE_DEPTHS {
+        let tree = Tree::new(depth);
+        let mut dists = vec![-1; tree.num_nodes()];
 
-    let visited = (0..15)
-        .into_iter()
-        .map(|i| AtomicBool::new(i == 0))
-        .collect::<Vec<_>>();
-    let mut dists = vec![-1; 15];
-
-    let mut current_frontier = vec![0];
-    let next_frontier = Mutex::new(Vec::new());
-    let mut current_dist = 0;
-
-    {
-        let dists = dists.as_data_race_par_slice();
-        while !current_frontier.is_empty() {
-            current_frontier.par_iter().for_each(|&node| {
-                // Update dist value
+        {
+            let dists = dists.as_data_race_par_slice();
+            bfs(tree, |node, dist| {
                 unsafe {
                     // Safety: each node is accessed exactly once because of
                     // AtomicBool::swap so no data races can happen
                     // and node is always < dists.len() by construction
-                    dists.set_unchecked(node, current_dist);
-                }
-
-                // Enumerate successors for next frontier
-                for &succ in graph.successors(node) {
-                    if !visited[succ].swap(true, Ordering::Relaxed) {
-                        next_frontier.lock().unwrap().push(succ);
-                    }
+                    dists.set_unchecked(node, dist)
                 }
             });
-            current_dist += 1;
-            current_frontier.clear();
-            std::mem::swap(&mut current_frontier, &mut next_frontier.lock().unwrap());
         }
-    }
 
-    assert_eq!(dists, vec![0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]);
+        assert_eq!(dists, expected_dists(depth));
+    }
 }
 
 #[test]
 fn test_unsafe_bfs() {
-    let graph = Tree::new(4);
+    for &depth in TREE_DEPTHS {
+        let tree = Tree::new(depth);
+        let mut dists = vec![-1; tree.num_nodes()];
 
-    let visited = (0..15)
-        .into_iter()
-        .map(|i| AtomicBool::new(i == 0))
-        .collect::<Vec<_>>();
-    let mut dists = vec![-1; 15];
-
-    let mut current_frontier = vec![0];
-    let next_frontier = Mutex::new(Vec::new());
-    let mut current_dist = 0;
-
-    {
-        let dists = dists.as_unsafe_par_slice();
-        while !current_frontier.is_empty() {
-            current_frontier.par_iter().for_each(|&node| {
-                // Update dist value
-                let dist = unsafe {
+        {
+            let dists = dists.as_unsafe_par_slice();
+            bfs(tree, |node, dist| {
+                let dist_ref = unsafe {
                     // Safety: each node is accessed exactly once because of
                     // AtomicBool::swap, so no two &mut to the same memory can
                     // exist and node is always < dists.len() by construction
                     dists.get_mut_unchecked(node)
                 };
-                *dist = current_dist;
-
-                // Enumerate successors for next frontier
-                for &succ in graph.successors(node) {
-                    if !visited[succ].swap(true, Ordering::Relaxed) {
-                        next_frontier.lock().unwrap().push(succ);
-                    }
-                }
+                *dist_ref = dist;
             });
-            current_dist += 1;
-            current_frontier.clear();
-            std::mem::swap(&mut current_frontier, &mut next_frontier.lock().unwrap());
         }
-    }
 
-    assert_eq!(dists, vec![0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]);
+        assert_eq!(dists, expected_dists(depth));
+    }
 }
