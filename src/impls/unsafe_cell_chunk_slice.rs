@@ -73,8 +73,8 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerAccess<[T]> for Unsafe
 
         let mut ptr = self.inner.get() as *mut T;
         unsafe {
-            // Safety: ptr is derived from an allocated object so cannot be bigger
-            // than isize::MAX bytes
+            // Safety: caller is responsible for guaranteeing that
+            // offset stays in bounds of allocated object
             ptr = ptr.add(offset);
         }
         std::ptr::slice_from_raw_parts_mut(ptr, self.chunk_size)
@@ -104,7 +104,7 @@ impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceChunkAccess<T>
                 // Safety: the caller must guarantee that there are no data races
                 elem.write(*ptr);
 
-                // Safety: size_of::<T>() is < isize::MAX as it is allocated
+                // Safety: object is allocated and ptr is always in bounds
                 ptr = ptr.add(1);
             }
         }
@@ -130,7 +130,8 @@ impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceChunkAccess<T>
                 // Safety: the caller must guarantee that there are no data races
                 elem.write(*ptr);
 
-                // Safety: size_of::<T>() is < isize::MAX as it is allocated
+                // Safety: object is allocated and the caller guarantees that
+                // ptr is in bounds
                 ptr = ptr.add(1);
             }
         }
@@ -161,7 +162,7 @@ impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceChunkAccess<T>
                 // Safety: the caller must guarantee that there are no data races
                 *ptr = elem.clone();
 
-                // Safety: size_of::<T>() is < isize::MAX as it is allocated
+                // Safety: object is allocated and ptr is always in bounds
                 ptr = ptr.add(1);
             }
         }
@@ -182,7 +183,8 @@ impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceChunkAccess<T>
                 // Safety: the caller must guarantee that there are no data races
                 *ptr = elem.clone();
 
-                // Safety: size_of::<T>() is < isize::MAX as it is allocated
+                // Safety: object is allocated and the caller guarantees that
+                // ptr is in bounds
                 ptr = ptr.add(1);
             }
         }

@@ -52,8 +52,8 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerAccess<T> for UnsafeCe
 
         let ptr = self.0.get() as *mut T;
         unsafe {
-            // Safety: ptr is derived from an allocated object so cannot be bigger
-            // than isize::MAX bytes
+            // Safety: caller is responsible for guaranteeing that
+            // offset stays in bounds of allocated object
             ptr.add(index)
         }
     }
