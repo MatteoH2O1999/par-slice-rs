@@ -54,7 +54,7 @@ fn expected_dists(depth: u32) -> Vec<isize> {
 }
 
 #[test]
-fn test_pointer_bfs() {
+fn test_data_race_bfs() {
     main();
 }
 
