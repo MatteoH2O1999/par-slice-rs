@@ -12,7 +12,7 @@ pub(crate) fn assert_chunk_size(len: usize, chunk_size: usize) {
     )
 }
 
-impl<T: Sync> ParSliceView<T> for [T] {
+unsafe impl<T: Sync> ParSliceView<T> for [T] {
     #[inline(always)]
     fn as_pointer_par_slice(&mut self) -> impl PointerAccess<T> + Sync {
         UnsafeCellSlice::new_borrowed(self)
@@ -50,7 +50,7 @@ impl<T: Sync> ParSliceView<T> for [T] {
     }
 }
 
-impl<T: Sync> IntoParSlice<T> for Box<[T]> {
+unsafe impl<T: Sync> IntoParSlice<T> for Box<[T]> {
     #[inline(always)]
     fn into_pointer_par_slice(self) -> impl PointerAccess<T> + Into<Box<[T]>> + Sync {
         UnsafeCellSlice::new_owned(self)
@@ -94,7 +94,7 @@ impl<T: Sync> IntoParSlice<T> for Box<[T]> {
     }
 }
 
-impl<T: Sync> IntoParSlice<T> for Vec<T> {
+unsafe impl<T: Sync> IntoParSlice<T> for Vec<T> {
     #[inline(always)]
     fn into_pointer_par_slice(self) -> impl PointerAccess<T> + Into<Box<[T]>> + Sync {
         self.into_boxed_slice().into_pointer_par_slice()

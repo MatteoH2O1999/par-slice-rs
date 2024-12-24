@@ -1,6 +1,6 @@
 use super::*;
 
-pub trait ParSliceView<T> {
+pub unsafe trait ParSliceView<T> {
     fn as_pointer_par_slice(&mut self) -> impl PointerAccess<T> + Sync;
 
     fn as_data_race_par_slice(&mut self) -> impl UnsafeDataRaceAccess<T> + Sync;
@@ -17,7 +17,7 @@ pub trait ParSliceView<T> {
     fn as_unsafe_par_chunk_slice(&mut self, chunk_size: usize) -> impl UnsafeAccess<[T]> + Sync;
 }
 
-pub trait IntoParSlice<T> {
+pub unsafe trait IntoParSlice<T> {
     fn into_pointer_par_slice(self) -> impl PointerAccess<T> + Into<Box<[T]>> + Sync;
 
     fn into_data_race_par_slice(self) -> impl UnsafeDataRaceAccess<T> + Into<Box<[T]>> + Sync;
