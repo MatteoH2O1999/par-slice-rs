@@ -19,22 +19,24 @@
 /// In particular, implementors must guarantee that references are valid and do not alias or overlap as long as
 /// different indexes are used for the trait's methods.
 /// In addition, the following invariants must hold:
-/// * For each index `i`, `slice.get(i)` returns a shared reference to the element of index `i` in the collection,
-///   panicking whenever `i` is invalid (*ie.* out of bounds). It is still up to the caller to ensure Rust's aliasing rules
+/// * For each collection of size `n`, indexes are defined from `0` to `n - 1`, each univocally identifying an element in
+///   the collection.
+/// * For each index `i`, `slice.get(i)` returns a shared reference to the element identified by index `i` in the collection,
+///   panicking whenever `i` is invalid (*i.e.* out of bounds). It is still up to the caller to ensure Rust's aliasing rules
 ///   are respected.
-/// * For each index `i`, `slice.get_unchecked(i)` returns a shared reference to the element of index `i` in the collection.
+/// * For each index `i`, `slice.get_unchecked(i)` returns a shared reference to the element identified by index `i` in the collection.
 ///   It is up to the caller to ensure Rust's aliasing rules are respected and that `i` is valid.
-/// * For each index `i`, `slice.get_mut(i)` returns a mutable reference to the element of index `i` in the collection,
-///   panicking whenever `i` is invalid (*ie.* out of bounds). It is still up to the caller to ensure Rust's aliasing rules
+/// * For each index `i`, `slice.get_mut(i)` returns a mutable reference to the element identified by index `i` in the collection,
+///   panicking whenever `i` is invalid (*i.e.* out of bounds). It is still up to the caller to ensure Rust's aliasing rules
 ///   are respected.
-/// * For each index `i`, `slice.get_mut_unchecked(i)` returns a mutable reference to the element of index `i` in the collection.
+/// * For each index `i`, `slice.get_mut_unchecked(i)` returns a mutable reference to the element identified by index `i` in the collection.
 ///   It is up to the caller to ensure Rust's aliasing rules are respected and that `i` is valid.
 /// * For each valid index `i`, `slice.get(i) == slice.get_unchecked(i)`.
 /// * For each valid index `i`, `slice.get_mut(i) == slice.get_mut_unchecked(i)`.
 ///
 /// # Examples
 ///
-/// Let's take `collection` a collection of 5 integers set to 0 that implements this trait and can be converted into a
+/// Let's take `collection`, a collection of 5 integers set to 0 that implements this trait and can be converted into a
 /// boxed slice.
 ///
 /// We can create multiple mutable references to different indexes as long as we respect Rust's aliasing rules:
@@ -61,7 +63,7 @@
 /// # let collection = vec![0; 5].into_unsafe_par_slice();
 /// unsafe {
 ///     let mut_ref_0 = collection.get_mut(0);
-///     // Instant UB: Rust's aliasing rules we violated
+///     // Instant UB: Rust's aliasing rules were violated
 ///     let mut_ref_0_copy = collection.get_mut_unchecked(0);
 /// }
 /// ```
@@ -90,7 +92,7 @@
 /// # let collection = vec![0; 5].into_unsafe_par_slice();
 /// unsafe {
 ///     let ref_0 = collection.get(0);
-///     // Instant UB: Rust's aliasing rules we violated
+///     // Instant UB: Rust's aliasing rules were violated
 ///     let mut_ref_0 = collection.get_mut_unchecked(0);
 /// }
 ///
@@ -98,7 +100,7 @@
 ///
 /// unsafe {
 ///     let mut_ref_0 = collection.get_mut(0);
-///     // Instant UB: Rust's aliasing rules we violated
+///     // Instant UB: Rust's aliasing rules were violated
 ///     let ref_0 = collection.get_unchecked(0);
 /// }
 /// ```
@@ -130,7 +132,7 @@
 ///
 /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
 pub unsafe trait UnsafeAccess<T: ?Sized> {
-    /// Returns a shared reference to the element at index `index` in the collection.
+    /// Returns a shared reference to the element identified by `index` in the collection.
     ///
     /// This method performs runtime checks on `index` to ensure its validity.
     /// If you can ensure its validity, you may want to use the [`get_unchecked`](`Self::get_unchecked`)
@@ -157,7 +159,7 @@ pub unsafe trait UnsafeAccess<T: ?Sized> {
     /// ```
     unsafe fn get(&self, index: usize) -> &T;
 
-    /// Returns a shared reference to the element at index `index` in the collection.
+    /// Returns a shared reference to the element identified by `index` in the collection.
     ///
     /// This method does not performs runtime checks on `index` to ensure its validity.
     /// If you can't ensure its validity, you may want to use the [`get`](`Self::get`) method instead.
@@ -181,7 +183,7 @@ pub unsafe trait UnsafeAccess<T: ?Sized> {
     /// ```
     unsafe fn get_unchecked(&self, index: usize) -> &T;
 
-    /// Returns a mutable reference to the element at index `index` in the collection.
+    /// Returns a mutable reference to the element identified by `index` in the collection.
     ///
     /// This method performs runtime checks on `index` to ensure its validity.
     /// If you can ensure its validity, you may want to use the [`get_mut_unchecked`](`Self::get_mut_unchecked`)
@@ -213,7 +215,7 @@ pub unsafe trait UnsafeAccess<T: ?Sized> {
     #[allow(clippy::mut_from_ref)]
     unsafe fn get_mut(&self, index: usize) -> &mut T;
 
-    /// Returns a mutable reference to the element at index `index` in the collection.
+    /// Returns a mutable reference to the element identified by `index` in the collection.
     ///
     /// This method does not performs runtime checks on `index` to ensure its validity.
     /// If you can't ensure its validity, you may want to use the [`get_mut`](`Self::get_mut`) method instead.
