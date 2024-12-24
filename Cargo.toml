@@ -9,3 +9,15 @@ license = "MIT"
 keywords = ["slice", "par", "parallel", "access", "concurrent"]
 categories = ["concurrency"]
 rust-version = "1.82"
+
+[[example]]
+name = "bfs_pointer"
+test = true
+
+[[example]]
+name = "bfs_data_race"
+test = true
+
+[[example]]
+name = "bfs_unsafe"
+test = true
