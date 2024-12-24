@@ -86,7 +86,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerAccess<[T]> for Unsafe
     }
 }
 
-impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceChunkAccess<T>
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceChunkAccess<T>
     for UnsafeCellChunkSlice<B>
 {
     #[inline(always)]
@@ -191,7 +191,7 @@ impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceChunkAccess<T>
     }
 }
 
-impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeAccess<[T]> for UnsafeCellChunkSlice<B> {
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeAccess<[T]> for UnsafeCellChunkSlice<B> {
     #[inline(always)]
     unsafe fn get(&self, index: usize) -> &[T] {
         unsafe {

@@ -64,7 +64,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerAccess<T> for UnsafeCe
     }
 }
 
-impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceAccess<T> for UnsafeCellSlice<B> {
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceAccess<T> for UnsafeCellSlice<B> {
     #[inline(always)]
     unsafe fn get(&self, index: usize) -> T
     where
@@ -110,7 +110,7 @@ impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceAccess<T> for UnsafeCe
     }
 }
 
-impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeAccess<T> for UnsafeCellSlice<B> {
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeAccess<T> for UnsafeCellSlice<B> {
     #[inline(always)]
     unsafe fn get(&self, index: usize) -> &T {
         unsafe {
