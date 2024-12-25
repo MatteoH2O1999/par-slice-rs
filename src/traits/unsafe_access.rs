@@ -84,7 +84,7 @@
 /// }
 /// ```
 ///
-/// But creating a mutable references when an other reference exists is not:
+/// But creating a mutable reference when any other reference to the same element exists is not:
 ///
 /// ```no_run
 /// # use par_slice::*;
