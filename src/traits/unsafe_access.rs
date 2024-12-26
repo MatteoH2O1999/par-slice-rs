@@ -24,18 +24,18 @@ use crate::*;
 /// * The collection has size [`len`](`TrustedSizedCollection::len`).
 /// * For each collection of size `n`, indexes are defined from `0` to `n - 1`, each univocally identifying an element in
 ///   the collection.
-/// * For each index `i`, `slice.get(i)` returns a shared reference to the element identified by index `i` in the collection,
+/// * For each index `i`, `collection.get(i)` returns a shared reference to the element identified by index `i` in the collection,
 ///   panicking whenever `i` is out of bounds. It is still up to the caller to ensure Rust's aliasing rules
 ///   are respected.
-/// * For each index `i`, `slice.get_unchecked(i)` returns a shared reference to the element identified by index `i` in the collection.
+/// * For each index `i`, `collection.get_unchecked(i)` returns a shared reference to the element identified by index `i` in the collection.
 ///   It is up to the caller to ensure Rust's aliasing rules are respected and that `i` is in bounds.
-/// * For each index `i`, `slice.get_mut(i)` returns a mutable reference to the element identified by index `i` in the collection,
+/// * For each index `i`, `collection.get_mut(i)` returns a mutable reference to the element identified by index `i` in the collection,
 ///   panicking whenever `i` is out of bounds. It is still up to the caller to ensure Rust's aliasing rules
 ///   are respected.
-/// * For each index `i`, `slice.get_mut_unchecked(i)` returns a mutable reference to the element identified by index `i` in the collection.
+/// * For each index `i`, `collection.get_mut_unchecked(i)` returns a mutable reference to the element identified by index `i` in the collection.
 ///   It is up to the caller to ensure Rust's aliasing rules are respected and that `i` is in bounds.
-/// * For each valid index `i`, `slice.get(i) == slice.get_unchecked(i)`.
-/// * For each valid index `i`, `slice.get_mut(i) == slice.get_mut_unchecked(i)`.
+/// * For each valid index `i`, `collection.get(i) == collection.get_unchecked(i)`.
+/// * For each valid index `i`, `collection.get_mut(i) == collection.get_mut_unchecked(i)`.
 ///
 /// # Examples
 ///
@@ -257,6 +257,25 @@ pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
     unsafe fn get_mut_unchecked(&self, index: usize) -> &mut T;
 }
 
+/// Marker trait for collections that allow unsynchronized access to non-overlapping chunks of their elements through references.
+///
+/// The trait allows *unsynchronized* access to chunks of elements of a collection by
+/// allowing the creation of *mutable references* to chunks of elements from a *shared reference* to the
+/// collection and its index.
+///
+/// The user is responsible to respect Rust's *aliasing rules* (one or more shared references or
+/// exactly one mutable reference).
+///
+/// # Safety
+///
+/// Implementors of this trait must guarantee the following invariants:
+/// * The collection contains [`num_chunks`](`TrustedChunkSizedCollection::num_chunks`) **non-overlapping** slices of `T`,
+///   each of len [`chunk_size`](`TrustedChunkSizedCollection::chunk_size`).
+/// * For each collection of size `n`, chunk indexes are defined from `0` to `n - 1`, each univocally identifying a chunk of elements in
+///   the collection as follows: a chunk of index `i` includes all elements from index `i * collection.chunk_size()` included to
+///   `(i + 1) * collection.chunk_size()` excluded.
+/// * The collection implements [`UnsafeAccess<[T]>`](`UnsafeAccess`) where `[T]` is a chunk, so `[T].len() == collection.chunk_size()`,
+///   and where all the methods' indexes refer to the chunk indexes as defined above.
 pub unsafe trait UnsafeChunkAccess<T>:
     UnsafeAccess<[T]> + TrustedChunkSizedCollection
 {
