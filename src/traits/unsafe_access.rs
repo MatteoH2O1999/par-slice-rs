@@ -39,15 +39,13 @@ use crate::*;
 ///
 /// # Examples
 ///
-/// Let's take `collection`, a collection of 5 integers set to 0 that implements this trait and can be converted into a
-/// boxed slice.
-///
 /// We can create multiple mutable references to different indexes as long as we respect Rust's aliasing rules:
 ///
 /// ```
 /// # use par_slice::*;
 /// #
-/// # let collection = vec![0; 5].into_unsafe_par_slice();
+/// let collection = vec![0; 5].into_unsafe_par_slice();
+///
 /// unsafe {
 ///     // This checks 0 is a valid index
 ///     *collection.get_mut(0) = 42;
@@ -63,7 +61,8 @@ use crate::*;
 /// ```no_run
 /// # use par_slice::*;
 /// #
-/// # let collection = vec![0; 5].into_unsafe_par_slice();
+/// let collection = vec![0; 5].into_unsafe_par_slice();
+///
 /// unsafe {
 ///     let mut_ref_0 = collection.get_mut(0);
 ///     // Instant UB: Rust's aliasing rules were violated
@@ -76,7 +75,8 @@ use crate::*;
 /// ```
 /// # use par_slice::*;
 /// #
-/// # let collection = vec![0; 5].into_unsafe_par_slice();
+/// let collection = vec![0; 5].into_unsafe_par_slice();
+///
 /// unsafe {
 ///     let ref_0 = collection.get(0);
 ///     // OK: Rust's aliasing rules are not violated
@@ -92,7 +92,8 @@ use crate::*;
 /// ```no_run
 /// # use par_slice::*;
 /// #
-/// # let collection = vec![0; 5].into_unsafe_par_slice();
+/// let collection = vec![0; 5].into_unsafe_par_slice();
+///
 /// unsafe {
 ///     let ref_0 = collection.get(0);
 ///     // Instant UB: Rust's aliasing rules were violated
@@ -113,7 +114,8 @@ use crate::*;
 /// ```
 /// # use par_slice::*;
 /// #
-/// # let collection = vec![0; 5].into_unsafe_par_slice();
+/// let collection = vec![0; 5].into_unsafe_par_slice();
+///
 /// unsafe {
 ///     let ref_0 = collection.get(0);
 /// }
@@ -151,12 +153,10 @@ pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// # Examples
     ///
-    /// Let's take `collection` a collection of 5 `usize` set to 0 that implements this trait.
-    ///
     /// ```
     /// # use par_slice::*;
     /// #
-    /// # let collection = vec![0; 5].into_unsafe_par_slice();
+    /// let collection = vec![0; 5].into_unsafe_par_slice();
     /// let ref_0: &usize = unsafe { collection.get(0) };
     /// assert_eq!(*ref_0, 0);
     /// ```
@@ -178,12 +178,10 @@ pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// # Examples
     ///
-    /// Let's take `collection` a collection of 5 `usize` set to 0 that implements this trait.
-    ///
     /// ```
     /// # use par_slice::*;
     /// #
-    /// # let collection = vec![0; 5].into_unsafe_par_slice();
+    /// let collection = vec![0; 5].into_unsafe_par_slice();
     /// // We know 0 is a valid index for a collection of length 5
     /// let ref_0: &usize = unsafe { collection.get_unchecked(0) };
     /// assert_eq!(*ref_0, 0);
@@ -206,12 +204,10 @@ pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// # Examples
     ///
-    /// Let's take `collection` a collection of 5 `usize` set to 0 that implements this trait.
-    ///
     /// ```
     /// # use par_slice::*;
     /// #
-    /// # let collection = vec![0; 5].into_unsafe_par_slice();
+    /// let collection = vec![0; 5].into_unsafe_par_slice();
     /// {
     ///     let ref_0: &mut usize = unsafe { collection.get_mut(0) };
     ///     *ref_0 = 42;
@@ -239,12 +235,10 @@ pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// # Examples
     ///
-    /// Let's take `collection` a collection of 5 `usize` set to 0 that implements this trait.
-    ///
     /// ```
     /// # use par_slice::*;
     /// #
-    /// # let collection = vec![0; 5].into_unsafe_par_slice();
+    /// let collection = vec![0; 5].into_unsafe_par_slice();
     /// {
     ///     // We know 0 is a valid index for a collection of length 5
     ///     let ref_0: &mut usize = unsafe { collection.get_mut_unchecked(0) };
