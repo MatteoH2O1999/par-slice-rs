@@ -151,10 +151,9 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceChunkAccess<T>
         T: Clone,
     {
         debug_assert!(index < self.len);
-        let fat_ptr = self.get_mut_ptr_unchecked(index);
-        debug_assert_eq!(value.len(), fat_ptr.len());
+        debug_assert_eq!(value.len(), self.chunk_size);
 
-        let mut ptr = fat_ptr as *mut T;
+        let mut ptr = self.get_mut_ptr_unchecked(index) as *mut T;
 
         for elem in value.iter() {
             unsafe {
