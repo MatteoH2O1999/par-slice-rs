@@ -1,5 +1,6 @@
+mod collection;
+
 mod conversion;
-pub(crate) use conversion::*;
 
 pub mod constructor;
 

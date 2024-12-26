@@ -1,17 +1,5 @@
 use crate::*;
 
-#[inline(always)]
-pub(crate) fn assert_chunk_size(len: usize, chunk_size: usize) {
-    assert!(
-        len % chunk_size == 0,
-        "chunk_size should be a divisor of len. {} / {} = {} with a remainder of {}",
-        len,
-        chunk_size,
-        len / chunk_size,
-        len % chunk_size
-    )
-}
-
 unsafe impl<T: Sync> ParSliceView<T> for [T] {
     #[inline(always)]
     fn as_pointer_par_slice(&mut self) -> impl PointerAccess<T> + Sync {
