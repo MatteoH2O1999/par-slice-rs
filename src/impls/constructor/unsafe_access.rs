@@ -29,7 +29,7 @@ impl UnsafeParSlice {
     pub fn new_chunks<T: Default + Sync>(
         len: usize,
         chunk_size: usize,
-    ) -> impl UnsafeAccess<[T]> + Into<Box<[T]>> + Sync {
+    ) -> impl UnsafeChunkAccess<T> + Into<Box<[T]>> + Sync {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice(len).into_unsafe_par_chunk_slice(chunk_size)
     }
@@ -39,7 +39,7 @@ impl UnsafeParSlice {
         value: T,
         len: usize,
         chunk_size: usize,
-    ) -> impl UnsafeAccess<[T]> + Into<Box<[T]>> + Sync {
+    ) -> impl UnsafeChunkAccess<T> + Into<Box<[T]>> + Sync {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice_with_value(len, value).into_unsafe_par_chunk_slice(chunk_size)
     }
@@ -49,7 +49,7 @@ impl UnsafeParSlice {
         closure: impl FnMut() -> T,
         len: usize,
         chunk_size: usize,
-    ) -> impl UnsafeAccess<[T]> + Into<Box<[T]>> + Sync {
+    ) -> impl UnsafeChunkAccess<T> + Into<Box<[T]>> + Sync {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice_with(len, closure).into_unsafe_par_chunk_slice(chunk_size)
     }

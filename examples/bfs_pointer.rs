@@ -84,11 +84,12 @@ pub fn main() {
                             while let Some(&node) =
                                 current_frontier.get(cursor.fetch_add(1, Ordering::Relaxed))
                             {
-                                let dist_ptr = dists.get_mut_ptr_unchecked(node);
                                 unsafe {
+                                    // Safety: node is always < dists.len() by construction
+                                    let dist_ptr = dists.get_mut_ptr_unchecked(node);
+
                                     // Safety: each node is accessed exactly once because of
                                     // AtomicBool::swap so no data races can happen
-                                    // and node is always < dists.len() by construction
                                     *dist_ptr = current_dist;
                                 }
 

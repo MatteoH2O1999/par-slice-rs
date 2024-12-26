@@ -29,7 +29,10 @@ unsafe impl<T: Sync> ParSliceView<T> for [T] {
     }
 
     #[inline(always)]
-    fn as_pointer_par_chunk_slice(&mut self, chunk_size: usize) -> impl PointerAccess<[T]> + Sync {
+    fn as_pointer_par_chunk_slice(
+        &mut self,
+        chunk_size: usize,
+    ) -> impl PointerChunkAccess<T> + Sync {
         assert_chunk_size(self.len(), chunk_size);
         UnsafeCellChunkSlice::new_borrowed(self, chunk_size)
     }
@@ -44,7 +47,7 @@ unsafe impl<T: Sync> ParSliceView<T> for [T] {
     }
 
     #[inline(always)]
-    fn as_unsafe_par_chunk_slice(&mut self, chunk_size: usize) -> impl UnsafeAccess<[T]> + Sync {
+    fn as_unsafe_par_chunk_slice(&mut self, chunk_size: usize) -> impl UnsafeChunkAccess<T> + Sync {
         assert_chunk_size(self.len(), chunk_size);
         UnsafeCellChunkSlice::new_borrowed(self, chunk_size)
     }
@@ -70,7 +73,7 @@ unsafe impl<T: Sync> IntoParSlice<T> for Box<[T]> {
     fn into_pointer_par_chunk_slice(
         self,
         chunk_size: usize,
-    ) -> impl PointerAccess<[T]> + Into<Box<[T]>> + Sync {
+    ) -> impl PointerChunkAccess<T> + Into<Box<[T]>> + Sync {
         assert_chunk_size(self.len(), chunk_size);
         UnsafeCellChunkSlice::new_owned(self, chunk_size)
     }
@@ -88,7 +91,7 @@ unsafe impl<T: Sync> IntoParSlice<T> for Box<[T]> {
     fn into_unsafe_par_chunk_slice(
         self,
         chunk_size: usize,
-    ) -> impl UnsafeAccess<[T]> + Into<Box<[T]>> + Sync {
+    ) -> impl UnsafeChunkAccess<T> + Into<Box<[T]>> + Sync {
         assert_chunk_size(self.len(), chunk_size);
         UnsafeCellChunkSlice::new_owned(self, chunk_size)
     }
@@ -114,7 +117,7 @@ unsafe impl<T: Sync> IntoParSlice<T> for Vec<T> {
     fn into_pointer_par_chunk_slice(
         self,
         chunk_size: usize,
-    ) -> impl PointerAccess<[T]> + Into<Box<[T]>> + Sync {
+    ) -> impl PointerChunkAccess<T> + Into<Box<[T]>> + Sync {
         assert_chunk_size(self.len(), chunk_size);
         self.into_boxed_slice()
             .into_pointer_par_chunk_slice(chunk_size)
@@ -134,7 +137,7 @@ unsafe impl<T: Sync> IntoParSlice<T> for Vec<T> {
     fn into_unsafe_par_chunk_slice(
         self,
         chunk_size: usize,
-    ) -> impl UnsafeAccess<[T]> + Into<Box<[T]>> + Sync {
+    ) -> impl UnsafeChunkAccess<T> + Into<Box<[T]>> + Sync {
         assert_chunk_size(self.len(), chunk_size);
         self.into_boxed_slice()
             .into_unsafe_par_chunk_slice(chunk_size)

@@ -3,7 +3,7 @@ use std::{cell::UnsafeCell, mem::size_of, ops::Deref};
 
 pub(crate) struct UnsafeCellSlice<B>(B);
 
-unsafe impl<T: Sync> Sync for UnsafeCellSlice<&UnsafeCell<[T]>> {}
+unsafe impl<T: Sync> Sync for UnsafeCellSlice<&mut UnsafeCell<[T]>> {}
 unsafe impl<T: Sync> Sync for UnsafeCellSlice<Box<UnsafeCell<[T]>>> {}
 
 impl<T> From<UnsafeCellSlice<Box<UnsafeCell<[T]>>>> for Box<[T]> {
@@ -16,7 +16,7 @@ impl<T> From<UnsafeCellSlice<Box<UnsafeCell<[T]>>>> for Box<[T]> {
     }
 }
 
-impl<T> UnsafeCellSlice<&UnsafeCell<[T]>> {
+impl<T> UnsafeCellSlice<&mut UnsafeCell<[T]>> {
     pub(crate) fn new_borrowed(slice: &mut [T]) -> Self {
         // TODO: replace with UnsafeCell::from_mut when stable
         let ptr = slice as *mut [T] as *mut UnsafeCell<[T]>;
@@ -39,14 +39,21 @@ impl<T> UnsafeCellSlice<Box<UnsafeCell<[T]>>> {
     }
 }
 
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedSizedCollection for UnsafeCellSlice<B> {
+    #[inline(always)]
+    fn len(&self) -> usize {
+        self.0.get().len()
+    }
+}
+
 unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerAccess<T> for UnsafeCellSlice<B> {
     #[inline(always)]
-    fn get_ptr_unchecked(&self, index: usize) -> *const T {
+    unsafe fn get_ptr_unchecked(&self, index: usize) -> *const T {
         self.get_mut_ptr_unchecked(index) as *const T
     }
 
     #[inline(always)]
-    fn get_mut_ptr_unchecked(&self, index: usize) -> *mut T {
+    unsafe fn get_mut_ptr_unchecked(&self, index: usize) -> *mut T {
         debug_assert!(index < self.len());
         debug_assert!(index * size_of::<T>() < isize::MAX as usize);
 
@@ -56,11 +63,6 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerAccess<T> for UnsafeCe
             // offset stays in bounds of allocated object
             ptr.add(index)
         }
-    }
-
-    #[inline(always)]
-    fn len(&self) -> usize {
-        self.0.get().len()
     }
 }
 

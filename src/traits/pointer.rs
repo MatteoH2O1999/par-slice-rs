@@ -1,14 +1,9 @@
-pub unsafe trait PointerAccess<T: ?Sized> {
-    fn len(&self) -> usize;
+use crate::*;
 
-    fn get_ptr_unchecked(&self, index: usize) -> *const T;
+pub unsafe trait PointerAccess<T: ?Sized>: TrustedSizedCollection {
+    unsafe fn get_ptr_unchecked(&self, index: usize) -> *const T;
 
-    fn get_mut_ptr_unchecked(&self, index: usize) -> *mut T;
-
-    #[inline(always)]
-    fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
+    unsafe fn get_mut_ptr_unchecked(&self, index: usize) -> *mut T;
 
     #[inline(always)]
     fn get_ptr(&self, index: usize) -> *const T {
@@ -18,7 +13,10 @@ pub unsafe trait PointerAccess<T: ?Sized> {
             index,
             self.len()
         );
-        self.get_ptr_unchecked(index)
+        unsafe {
+            // Safety: the caller is responsible for ensure index is in bounds
+            self.get_ptr_unchecked(index)
+        }
     }
 
     #[inline(always)]
@@ -29,6 +27,14 @@ pub unsafe trait PointerAccess<T: ?Sized> {
             index,
             self.len()
         );
-        self.get_mut_ptr_unchecked(index)
+        unsafe {
+            // Safety: the caller is responsible for ensure index is in bounds
+            self.get_mut_ptr_unchecked(index)
+        }
     }
+}
+
+pub unsafe trait PointerChunkAccess<T>:
+    PointerAccess<[T]> + TrustedChunkSizedCollection
+{
 }

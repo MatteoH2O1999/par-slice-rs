@@ -1,3 +1,5 @@
+use crate::*;
+
 /// Unsynchronized access to elements of a collection through references.
 ///
 /// The trait allows *unsynchronized* access to the elements of a collection by
@@ -19,18 +21,19 @@
 /// In particular, implementors must guarantee that references are valid and do not alias or overlap as long as
 /// different indexes are used for the trait's methods.
 /// In addition, the following invariants must hold:
+/// * The collection has size [`len`](`TrustedSizedCollection::len`).
 /// * For each collection of size `n`, indexes are defined from `0` to `n - 1`, each univocally identifying an element in
 ///   the collection.
 /// * For each index `i`, `slice.get(i)` returns a shared reference to the element identified by index `i` in the collection,
-///   panicking whenever `i` is invalid (*i.e.* out of bounds). It is still up to the caller to ensure Rust's aliasing rules
+///   panicking whenever `i` is out of bounds. It is still up to the caller to ensure Rust's aliasing rules
 ///   are respected.
 /// * For each index `i`, `slice.get_unchecked(i)` returns a shared reference to the element identified by index `i` in the collection.
-///   It is up to the caller to ensure Rust's aliasing rules are respected and that `i` is valid.
+///   It is up to the caller to ensure Rust's aliasing rules are respected and that `i` is in bounds.
 /// * For each index `i`, `slice.get_mut(i)` returns a mutable reference to the element identified by index `i` in the collection,
-///   panicking whenever `i` is invalid (*i.e.* out of bounds). It is still up to the caller to ensure Rust's aliasing rules
+///   panicking whenever `i` is out of bounds. It is still up to the caller to ensure Rust's aliasing rules
 ///   are respected.
 /// * For each index `i`, `slice.get_mut_unchecked(i)` returns a mutable reference to the element identified by index `i` in the collection.
-///   It is up to the caller to ensure Rust's aliasing rules are respected and that `i` is valid.
+///   It is up to the caller to ensure Rust's aliasing rules are respected and that `i` is in bounds.
 /// * For each valid index `i`, `slice.get(i) == slice.get_unchecked(i)`.
 /// * For each valid index `i`, `slice.get_mut(i) == slice.get_mut_unchecked(i)`.
 ///
@@ -131,10 +134,10 @@
 /// ```
 ///
 /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
-pub unsafe trait UnsafeAccess<T: ?Sized> {
+pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
     /// Returns a shared reference to the element identified by `index` in the collection.
     ///
-    /// This method performs runtime checks on `index` to ensure its validity.
+    /// This method performs bounds checking on `index` to ensure its validity.
     /// If you can ensure its validity, you may want to use the [`get_unchecked`](`Self::get_unchecked`)
     /// method instead.
     ///
@@ -157,11 +160,15 @@ pub unsafe trait UnsafeAccess<T: ?Sized> {
     /// let ref_0: &usize = unsafe { collection.get(0) };
     /// assert_eq!(*ref_0, 0);
     /// ```
-    unsafe fn get(&self, index: usize) -> &T;
+    unsafe fn get(&self, index: usize) -> &T {
+        assert_in_bounds(self.len(), index);
+        self.get_unchecked(index)
+    }
 
-    /// Returns a shared reference to the element identified by `index` in the collection.
+    /// Returns a shared reference to the element identified by `index` in the collection, without performing
+    /// bounds checking.
     ///
-    /// This method does not performs runtime checks on `index` to ensure its validity.
+    /// This method does not perform bounds checking on `index` to ensure its validity.
     /// If you can't ensure its validity, you may want to use the [`get`](`Self::get`) method instead.
     ///
     /// # Safety
@@ -185,7 +192,7 @@ pub unsafe trait UnsafeAccess<T: ?Sized> {
 
     /// Returns a mutable reference to the element identified by `index` in the collection.
     ///
-    /// This method performs runtime checks on `index` to ensure its validity.
+    /// This method performs bounds checking on `index` to ensure its validity.
     /// If you can ensure its validity, you may want to use the [`get_mut_unchecked`](`Self::get_mut_unchecked`)
     /// method instead.
     ///
@@ -213,11 +220,16 @@ pub unsafe trait UnsafeAccess<T: ?Sized> {
     /// assert_eq!(unsafe { *collection.get(0) }, 42);
     /// ```
     #[allow(clippy::mut_from_ref)]
-    unsafe fn get_mut(&self, index: usize) -> &mut T;
+    #[inline(always)]
+    unsafe fn get_mut(&self, index: usize) -> &mut T {
+        assert_in_bounds(self.len(), index);
+        self.get_mut_unchecked(index)
+    }
 
-    /// Returns a mutable reference to the element identified by `index` in the collection.
+    /// Returns a mutable reference to the element identified by `index` in the collection, without performing
+    /// bounds checking.
     ///
-    /// This method does not performs runtime checks on `index` to ensure its validity.
+    /// This method does not performs bounds checking on `index` to ensure its validity.
     /// If you can't ensure its validity, you may want to use the [`get_mut`](`Self::get_mut`) method instead.
     ///
     /// # Safety
@@ -243,4 +255,9 @@ pub unsafe trait UnsafeAccess<T: ?Sized> {
     /// ```
     #[allow(clippy::mut_from_ref)]
     unsafe fn get_mut_unchecked(&self, index: usize) -> &mut T;
+}
+
+pub unsafe trait UnsafeChunkAccess<T>:
+    UnsafeAccess<[T]> + TrustedChunkSizedCollection
+{
 }

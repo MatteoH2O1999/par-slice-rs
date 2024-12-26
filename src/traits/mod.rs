@@ -1,6 +1,9 @@
 mod conversion;
 pub use conversion::*;
 
+mod collection;
+pub use collection::*;
+
 mod data_race;
 pub use data_race::*;
 
