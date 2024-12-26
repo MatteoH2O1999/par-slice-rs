@@ -6,7 +6,10 @@ pub unsafe trait UnsafeDataRaceAccess<T: ?Sized>: TrustedSizedCollection {
         T: Copy,
     {
         assert_in_bounds(self.len(), index);
-        self.get_unchecked(index)
+        unsafe {
+            // Safety: we just checked that index is in bounds
+            self.get_unchecked(index)
+        }
     }
 
     unsafe fn get_unchecked(&self, index: usize) -> T
@@ -18,7 +21,10 @@ pub unsafe trait UnsafeDataRaceAccess<T: ?Sized>: TrustedSizedCollection {
         T: Sized,
     {
         assert_in_bounds(self.len(), index);
-        self.set_unchecked(index, value);
+        unsafe {
+            // Safety: we just checked that index is in bounds
+            self.set_unchecked(index, value);
+        }
     }
 
     unsafe fn set_unchecked(&self, index: usize, value: T)
@@ -33,7 +39,10 @@ pub unsafe trait UnsafeDataRaceChunkAccess<T>: TrustedChunkSizedCollection {
         T: Copy,
     {
         assert_in_bounds(self.len(), index);
-        self.get_unchecked(index)
+        unsafe {
+            // Safety: we just checked that index is in bounds
+            self.get_unchecked(index)
+        }
     }
 
     unsafe fn get_unchecked(&self, index: usize) -> Box<[T]>
@@ -47,7 +56,11 @@ pub unsafe trait UnsafeDataRaceChunkAccess<T>: TrustedChunkSizedCollection {
     {
         assert_in_bounds(self.len(), index);
         assert_chunk_compatible(self.chunk_size(), value);
-        self.set_unchecked(index, value);
+        unsafe {
+            // Safety: we just checked that index is in bounds and value is compatible
+            // with chunk_size
+            self.set_unchecked(index, value);
+        }
     }
 
     unsafe fn set_unchecked(&self, index: usize, value: &[T])

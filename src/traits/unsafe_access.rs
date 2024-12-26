@@ -162,7 +162,10 @@ pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
     /// ```
     unsafe fn get(&self, index: usize) -> &T {
         assert_in_bounds(self.len(), index);
-        self.get_unchecked(index)
+        unsafe {
+            // Safety: we just checked that index is in bounds
+            self.get_unchecked(index)
+        }
     }
 
     /// Returns a shared reference to the element identified by `index` in the collection, without performing
@@ -219,7 +222,10 @@ pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
     #[inline(always)]
     unsafe fn get_mut(&self, index: usize) -> &mut T {
         assert_in_bounds(self.len(), index);
-        self.get_mut_unchecked(index)
+        unsafe {
+            // Safety: we just checked that index is in bounds
+            self.get_mut_unchecked(index)
+        }
     }
 
     /// Returns a mutable reference to the element identified by `index` in the collection, without performing

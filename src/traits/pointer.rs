@@ -9,7 +9,7 @@ pub unsafe trait PointerAccess<T: ?Sized>: TrustedSizedCollection {
     fn get_ptr(&self, index: usize) -> *const T {
         assert_in_bounds(self.len(), index);
         unsafe {
-            // Safety: the caller is responsible for ensuring index is in bounds
+            // Safety: we just checked that index is in bounds
             self.get_ptr_unchecked(index)
         }
     }
@@ -18,7 +18,7 @@ pub unsafe trait PointerAccess<T: ?Sized>: TrustedSizedCollection {
     fn get_mut_ptr(&self, index: usize) -> *mut T {
         assert_in_bounds(self.len(), index);
         unsafe {
-            // Safety: the caller is responsible for ensuring index is in bounds
+            // Safety: we just checked that index is in bounds
             self.get_mut_ptr_unchecked(index)
         }
     }
