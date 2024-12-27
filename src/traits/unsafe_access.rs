@@ -43,7 +43,6 @@ use crate::*;
 ///
 /// ```
 /// # use par_slice::*;
-/// #
 /// let collection = vec![0; 5].into_unsafe_par_slice();
 ///
 /// unsafe {
@@ -60,7 +59,6 @@ use crate::*;
 ///
 /// ```no_run
 /// # use par_slice::*;
-/// #
 /// let collection = vec![0; 5].into_unsafe_par_slice();
 ///
 /// unsafe {
@@ -74,7 +72,6 @@ use crate::*;
 ///
 /// ```
 /// # use par_slice::*;
-/// #
 /// let collection = vec![0; 5].into_unsafe_par_slice();
 ///
 /// unsafe {
@@ -91,7 +88,6 @@ use crate::*;
 ///
 /// ```no_run
 /// # use par_slice::*;
-/// #
 /// let collection = vec![0; 5].into_unsafe_par_slice();
 ///
 /// unsafe {
@@ -113,7 +109,6 @@ use crate::*;
 ///
 /// ```
 /// # use par_slice::*;
-/// #
 /// let collection = vec![0; 5].into_unsafe_par_slice();
 ///
 /// unsafe {
@@ -155,7 +150,6 @@ pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// #
     /// let collection = vec![0; 5].into_unsafe_par_slice();
     /// let ref_0: &usize = unsafe { collection.get(0) };
     /// assert_eq!(*ref_0, 0);
@@ -183,7 +177,6 @@ pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// #
     /// let collection = vec![0; 5].into_unsafe_par_slice();
     /// // We know 0 is a valid index for a collection of length 5
     /// let ref_0: &usize = unsafe { collection.get_unchecked(0) };
@@ -209,7 +202,6 @@ pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// #
     /// let collection = vec![0; 5].into_unsafe_par_slice();
     /// {
     ///     let ref_0: &mut usize = unsafe { collection.get_mut(0) };
@@ -243,7 +235,6 @@ pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// #
     /// let collection = vec![0; 5].into_unsafe_par_slice();
     /// {
     ///     // We know 0 is a valid index for a collection of length 5

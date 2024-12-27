@@ -1,5 +1,108 @@
 use crate::*;
 
+/// Unsynchronized access to elements of a collection through pointers.
+///
+/// The trait allows *unsynchronized* access to the elements of a collection by
+/// allowing the creation of *mutable pointers* from a *shared reference* to the
+/// collection and its index.
+///
+/// The user is responsible to avoid data races to respect Rust's *aliasing rules* (one or more shared references or
+/// exactly one mutable reference) when dereferencing pointers.
+///
+/// For more details see the individual methods.
+///
+/// # Safety
+///
+/// Implementors must be careful of [undefined behavior] when returning mutable pointers
+/// starting from a shared reference.
+/// It is advisable to learn about [interior mutability](https://doc.rust-lang.org/reference/interior-mutability.html)
+/// before trying to implement this trait.
+///
+/// In particular, implementors must guarantee that references are valid and do not alias or overlap as long as
+/// different indexes are used for the trait's methods.
+/// In addition, the following invariants must hold:
+/// * The collection has size [`len`](`TrustedSizedCollection::len`).
+/// * For each collection of size `n`, indexes are defined from `0` to `n - 1`, each univocally identifying an element in
+///   the collection.
+/// * For each index `i`, `collection.get_ptr(i)` returns an immutable pointer to the element identified by index `i` in the collection,
+///   panicking whenever `i` is out of bounds. It is still up to the caller to ensure the pointer does not lead to undefined behavior.
+/// * For each index `i`, `collection.get_ptr_unchecked(i)` returns an immutable pointer to the element identified by index `i` in the collection.
+///   It is up to the caller to ensure the pointer does not lead to undefined behavior and that `i` is in bounds.
+/// * For each index `i`, `collection.get_mut_ptr(i)` returns a mutable pointer to the element identified by index `i` in the collection,
+///   panicking whenever `i` is out of bounds. It is still up to the caller to ensure the pointer does not lead to undefined behavior.
+/// * For each index `i`, `collection.get_mut_ptr_unchecked(i)` returns a mutable pointer to the element identified by index `i` in the collection.
+///   It is up to the caller to ensure the pointer does not lead to undefined behavior and that `i` is in bounds.
+/// * For each valid index `i`, `collection.get_ptr(i) == collection.get_ptr_unchecked(i)`.
+/// * For each valid index `i`, `collection.get_mut_ptr(i) == collection.get_mut_ptr_unchecked(i)`.
+/// * Every returned pointer must be valid for the lifetime of the collection.
+///
+/// # Examples
+///
+/// We can create all the pointers we want:
+///
+/// ```
+/// # use par_slice::*;
+/// let collection = vec![0; 5].into_pointer_par_slice();
+/// let mut_ptr_0 = collection.get_mut_ptr(0);
+/// let mut_ptr_1 = unsafe {
+///     // We know 1 is a valid index
+///     collection.get_mut_ptr_unchecked(1)
+/// };
+/// let ptr_0 = collection.get_ptr(1);
+/// let ptr_1 = unsafe {
+///     // We know 1 is a valid index
+///     collection.get_ptr_unchecked(1)
+/// };
+/// ```
+///
+/// In order to dereference pointers we must ensure no data races can happen:
+///
+/// ```
+/// # use par_slice::*;
+/// let collection = vec![0; 5].into_pointer_par_slice();
+/// let ptr = collection.get_mut_ptr(0);
+/// unsafe {
+///     // There are no data races and no references to element 0
+///     // so this is safe.
+///     *ptr = 42;
+/// }
+/// assert_eq!(collection.into().as_ref(), vec![42, 0, 0, 0, 0]);
+/// ```
+///
+/// We can also create references if we can guarantee Rust's aliasing rules:
+///
+/// ```
+/// # use par_slice::*;
+/// let collection = vec![0; 5].into_pointer_par_slice();
+/// let ptr = collection.get_mut_ptr(0);
+/// {
+///     let reference = unsafe {
+///         // No other references to element 0 exist so this is safe.
+///         &mut *ptr
+///     };
+///     *reference = 42;
+/// }
+/// assert_eq!(collection.into().as_ref(), vec![42, 0, 0, 0, 0]);
+/// ```
+///
+/// This is undefined behavior:
+///
+/// ```no_run
+/// # use par_slice::*;
+/// let collection = vec![0; 5].into_pointer_par_slice();
+/// let ptr = collection.get_mut_ptr(0);
+/// {
+///     let reference = unsafe {
+///         // No other references to element 0 exist so this is safe.
+///         &mut *ptr
+///     };
+///     *reference = 42;
+///     let reference_copy = unsafe {
+///         // This is UB: reference is still alive
+///         & *ptr
+///     };
+/// }
+/// ```
 pub unsafe trait PointerAccess<T: ?Sized>: TrustedSizedCollection {
     unsafe fn get_ptr_unchecked(&self, index: usize) -> *const T;
 
