@@ -18,7 +18,14 @@ fn new_boxed_slice_with<T: Sync>(len: usize, mut closure: impl FnMut() -> T) -> 
 
 #[inline(always)]
 fn new_boxed_slice_with_value<T: Sync + Clone>(len: usize, value: T) -> Box<[T]> {
-    new_boxed_slice_with(len, || value.clone())
+    let mut boxed = Box::new_uninit_slice(len);
+    if let Some((first, elems)) = boxed.split_first_mut() {
+        for elem in elems {
+            elem.write(value.clone());
+        }
+        first.write(value);
+    }
+    unsafe { boxed.assume_init() }
 }
 
 #[inline(always)]
