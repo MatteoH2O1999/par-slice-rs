@@ -1,6 +1,7 @@
 use crate::*;
 use std::{cell::UnsafeCell, mem::size_of, ops::Deref};
 
+#[derive(Debug)]
 pub(crate) struct UnsafeCellChunkSlice<B> {
     inner: B,
     len: usize,
