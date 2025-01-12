@@ -21,19 +21,13 @@ impl<T> From<UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>> for Box<[T]> {
     }
 }
 
-impl<T> UnsafeCellChunkSlice<&mut UnsafeCell<[T]>> {
-    pub(crate) fn new_borrowed(slice: &mut [T], chunk_size: usize) -> Self {
+impl<'a, T> UnsafeCellChunkSlice<&'a mut UnsafeCell<[T]>> {
+    pub(crate) fn new_borrowed(slice: &'a mut [T], chunk_size: usize) -> Self {
         assert_eq!(slice.len() % chunk_size, 0);
         let len = slice.len() / chunk_size;
 
-        // TODO: replace with UnsafeCell::from_mut when stable
-        let ptr = slice as *mut [T] as *mut UnsafeCell<[T]>;
-        let unsafe_slice = unsafe {
-            // Safety: UnsafeCell is repr(transparent)
-            &mut *ptr
-        };
         Self {
-            inner: unsafe_slice,
+            inner: UnsafeCell::from_mut(slice),
             len,
             chunk_size,
         }

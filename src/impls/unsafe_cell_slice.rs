@@ -17,15 +17,10 @@ impl<T> From<UnsafeCellSlice<Box<UnsafeCell<[T]>>>> for Box<[T]> {
     }
 }
 
-impl<T> UnsafeCellSlice<&mut UnsafeCell<[T]>> {
-    pub(crate) fn new_borrowed(slice: &mut [T]) -> Self {
-        // TODO: replace with UnsafeCell::from_mut when stable
-        let ptr = slice as *mut [T] as *mut UnsafeCell<[T]>;
-        let unsafe_slice = unsafe {
-            // Safety: UnsafeCell is repr(transparent)
-            &mut *ptr
-        };
-        Self(unsafe_slice)
+impl<'a, T> UnsafeCellSlice<&'a mut UnsafeCell<[T]>> {
+    #[inline(always)]
+    pub(crate) fn new_borrowed(slice: &'a mut [T]) -> Self {
+        Self(UnsafeCell::from_mut(slice))
     }
 }
 

@@ -8,7 +8,7 @@ repository = "https://github.com/MatteoH2O1999/par-slice-rs"
 license = "MIT"
 keywords = ["slice", "par", "parallel", "access", "concurrent"]
 categories = ["concurrency"]
-rust-version = "1.82"
+rust-version = "1.84"
 
 [[example]]
 name = "bfs_pointer"
