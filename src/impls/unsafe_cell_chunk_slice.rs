@@ -13,11 +13,13 @@ unsafe impl<T: Sync> Sync for UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {}
 
 impl<T> From<UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>> for Box<[T]> {
     fn from(value: UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>) -> Self {
-        let ptr = Box::into_raw(value.inner) as *mut [T];
-        unsafe {
-            // Safety: pointer is owned and repr is transparent
-            Box::from_raw(ptr)
-        }
+        value.into_inner()
+    }
+}
+
+impl<T> From<UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>> for Vec<T> {
+    fn from(value: UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>) -> Self {
+        value.into_inner().into_vec()
     }
 }
 
@@ -49,6 +51,14 @@ impl<T> UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {
             inner: boxed,
             len,
             chunk_size,
+        }
+    }
+
+    fn into_inner(self) -> Box<[T]> {
+        let ptr = Box::into_raw(self.inner) as *mut [T];
+        unsafe {
+            // Safety: pointer is owned and repr is transparent
+            Box::from_raw(ptr)
         }
     }
 }
