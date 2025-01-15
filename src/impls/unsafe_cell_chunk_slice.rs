@@ -12,18 +12,21 @@ unsafe impl<T: Sync> Sync for UnsafeCellChunkSlice<&mut UnsafeCell<[T]>> {}
 unsafe impl<T: Sync> Sync for UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {}
 
 impl<T> From<UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>> for Box<[T]> {
+    #[inline(always)]
     fn from(value: UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>) -> Self {
         value.into_inner()
     }
 }
 
 impl<T> From<UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>> for Vec<T> {
+    #[inline(always)]
     fn from(value: UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>) -> Self {
         value.into_inner().into_vec()
     }
 }
 
 impl<'a, T> UnsafeCellChunkSlice<&'a mut UnsafeCell<[T]>> {
+    #[inline(always)]
     pub(crate) fn new_borrowed(slice: &'a mut [T], chunk_size: usize) -> Self {
         assert_eq!(slice.len() % chunk_size, 0);
         let len = slice.len() / chunk_size;
@@ -37,6 +40,7 @@ impl<'a, T> UnsafeCellChunkSlice<&'a mut UnsafeCell<[T]>> {
 }
 
 impl<T> UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {
+    #[inline(always)]
     pub(crate) fn new_owned(slice: Box<[T]>, chunk_size: usize) -> Self {
         assert_eq!(slice.len() % chunk_size, 0);
         let len = slice.len() / chunk_size;
@@ -54,6 +58,7 @@ impl<T> UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {
         }
     }
 
+    #[inline(always)]
     fn into_inner(self) -> Box<[T]> {
         let ptr = Box::into_raw(self.inner) as *mut [T];
         unsafe {

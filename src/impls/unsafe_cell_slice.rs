@@ -8,12 +8,14 @@ unsafe impl<T: Sync> Sync for UnsafeCellSlice<&mut UnsafeCell<[T]>> {}
 unsafe impl<T: Sync> Sync for UnsafeCellSlice<Box<UnsafeCell<[T]>>> {}
 
 impl<T> From<UnsafeCellSlice<Box<UnsafeCell<[T]>>>> for Box<[T]> {
+    #[inline(always)]
     fn from(value: UnsafeCellSlice<Box<UnsafeCell<[T]>>>) -> Self {
         value.into_inner()
     }
 }
 
 impl<T> From<UnsafeCellSlice<Box<UnsafeCell<[T]>>>> for Vec<T> {
+    #[inline(always)]
     fn from(value: UnsafeCellSlice<Box<UnsafeCell<[T]>>>) -> Self {
         value.into_inner().into_vec()
     }
@@ -27,6 +29,7 @@ impl<'a, T> UnsafeCellSlice<&'a mut UnsafeCell<[T]>> {
 }
 
 impl<T> UnsafeCellSlice<Box<UnsafeCell<[T]>>> {
+    #[inline(always)]
     pub(crate) fn new_owned(slice: Box<[T]>) -> Self {
         let ptr = Box::into_raw(slice) as *mut UnsafeCell<[T]>;
         let boxed = unsafe {
@@ -36,6 +39,7 @@ impl<T> UnsafeCellSlice<Box<UnsafeCell<[T]>>> {
         Self(boxed)
     }
 
+    #[inline(always)]
     fn into_inner(self) -> Box<[T]> {
         let ptr = Box::into_raw(self.0) as *mut [T];
         unsafe {
