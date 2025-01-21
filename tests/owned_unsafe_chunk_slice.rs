@@ -3,7 +3,7 @@ use std::thread::scope;
 
 #[test]
 #[should_panic(expected = "chunk_size should be a divisor of len. 7 / 2 = 3 with a remainder of 1")]
-fn test_invalid_chunk_size() {
+fn invalid_chunk_size() {
     vec![1, 2, 3, 4, 5, 6, 7].into_unsafe_par_chunk_slice(2);
 }
 
