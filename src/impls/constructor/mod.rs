@@ -8,7 +8,7 @@ mod unsafe_access;
 pub use unsafe_access::*;
 
 #[inline(always)]
-fn new_boxed_slice_with<T: Sync>(len: usize, mut closure: impl FnMut() -> T) -> Box<[T]> {
+fn new_boxed_slice_with<T>(len: usize, mut closure: impl FnMut() -> T) -> Box<[T]> {
     let mut boxed = Box::new_uninit_slice(len);
     for elem in boxed.iter_mut() {
         elem.write(closure());
@@ -17,7 +17,7 @@ fn new_boxed_slice_with<T: Sync>(len: usize, mut closure: impl FnMut() -> T) -> 
 }
 
 #[inline(always)]
-fn new_boxed_slice_with_value<T: Sync + Clone>(len: usize, value: T) -> Box<[T]> {
+fn new_boxed_slice_with_value<T: Clone>(len: usize, value: T) -> Box<[T]> {
     let mut boxed = Box::new_uninit_slice(len);
     if let Some((first, elems)) = boxed.split_first_mut() {
         for elem in elems {
@@ -29,6 +29,6 @@ fn new_boxed_slice_with_value<T: Sync + Clone>(len: usize, value: T) -> Box<[T]>
 }
 
 #[inline(always)]
-fn new_boxed_slice<T: Sync + Default>(len: usize) -> Box<[T]> {
+fn new_boxed_slice<T: Default>(len: usize) -> Box<[T]> {
     new_boxed_slice_with(len, T::default)
 }

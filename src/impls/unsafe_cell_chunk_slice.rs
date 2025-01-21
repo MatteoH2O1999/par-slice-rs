@@ -8,8 +8,8 @@ pub(crate) struct UnsafeCellChunkSlice<B> {
     chunk_size: usize,
 }
 
-unsafe impl<T: Sync> Sync for UnsafeCellChunkSlice<&mut UnsafeCell<[T]>> {}
-unsafe impl<T: Sync> Sync for UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {}
+unsafe impl<T: Send> Sync for UnsafeCellChunkSlice<&mut UnsafeCell<[T]>> {}
+unsafe impl<T: Send> Sync for UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {}
 
 impl<T> From<UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>> for Box<[T]> {
     #[inline(always)]

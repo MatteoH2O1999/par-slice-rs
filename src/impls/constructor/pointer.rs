@@ -6,14 +6,14 @@ pub struct PointerParSlice;
 impl PointerParSlice {
     #[allow(clippy::new_ret_no_self)]
     #[inline(always)]
-    pub fn new<T: Default + Sync>(
+    pub fn new<T: Default + Send>(
         len: usize,
     ) -> impl PointerAccess<T> + Into<Box<[T]>> + Sync + Debug {
         new_boxed_slice(len).into_pointer_par_slice()
     }
 
     #[inline(always)]
-    pub fn with_value<T: Clone + Sync>(
+    pub fn with_value<T: Clone + Send>(
         value: T,
         len: usize,
     ) -> impl PointerAccess<T> + Into<Box<[T]>> + Sync + Debug {
@@ -21,7 +21,7 @@ impl PointerParSlice {
     }
 
     #[inline(always)]
-    pub fn with_closure<T: Sync>(
+    pub fn with_closure<T: Send>(
         closure: impl FnMut() -> T,
         len: usize,
     ) -> impl PointerAccess<T> + Into<Box<[T]>> + Sync + Debug {
@@ -29,7 +29,7 @@ impl PointerParSlice {
     }
 
     #[inline(always)]
-    pub fn new_chunks<T: Default + Sync>(
+    pub fn new_chunks<T: Default + Send>(
         len: usize,
         chunk_size: usize,
     ) -> impl PointerChunkAccess<T> + Into<Box<[T]>> + Sync + Debug {
@@ -38,7 +38,7 @@ impl PointerParSlice {
     }
 
     #[inline(always)]
-    pub fn chunks_with_value<T: Clone + Sync>(
+    pub fn chunks_with_value<T: Clone + Send>(
         value: T,
         len: usize,
         chunk_size: usize,
@@ -48,7 +48,7 @@ impl PointerParSlice {
     }
 
     #[inline(always)]
-    pub fn chunks_with_closure<T: Sync>(
+    pub fn chunks_with_closure<T: Send>(
         closure: impl FnMut() -> T,
         len: usize,
         chunk_size: usize,

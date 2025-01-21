@@ -1,7 +1,7 @@
 use crate::*;
 use std::fmt::Debug;
 
-unsafe impl<T: Sync> ParSliceView<T> for [T] {
+unsafe impl<T: Send> ParSliceView<T> for [T] {
     #[inline(always)]
     fn as_pointer_par_slice(&mut self) -> impl PointerAccess<T> + Sync + Debug {
         UnsafeCellSlice::new_borrowed(self)
@@ -45,7 +45,7 @@ unsafe impl<T: Sync> ParSliceView<T> for [T] {
     }
 }
 
-unsafe impl<T: Sync> IntoParSlice<T> for Box<[T]> {
+unsafe impl<T: Send> IntoParSlice<T> for Box<[T]> {
     #[inline(always)]
     fn into_pointer_par_slice(self) -> impl PointerAccess<T> + Into<Self> + Sync + Debug {
         UnsafeCellSlice::new_owned(self)
@@ -89,7 +89,7 @@ unsafe impl<T: Sync> IntoParSlice<T> for Box<[T]> {
     }
 }
 
-unsafe impl<T: Sync> IntoParSlice<T> for Vec<T> {
+unsafe impl<T: Send> IntoParSlice<T> for Vec<T> {
     #[inline(always)]
     fn into_pointer_par_slice(self) -> impl PointerAccess<T> + Into<Self> + Sync + Debug {
         UnsafeCellSlice::new_owned(self.into_boxed_slice())

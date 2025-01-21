@@ -4,8 +4,8 @@ use std::{cell::UnsafeCell, mem::size_of, ops::Deref};
 #[derive(Debug)]
 pub(crate) struct UnsafeCellSlice<B>(B);
 
-unsafe impl<T: Sync> Sync for UnsafeCellSlice<&mut UnsafeCell<[T]>> {}
-unsafe impl<T: Sync> Sync for UnsafeCellSlice<Box<UnsafeCell<[T]>>> {}
+unsafe impl<T: Send> Sync for UnsafeCellSlice<&mut UnsafeCell<[T]>> {}
+unsafe impl<T: Send> Sync for UnsafeCellSlice<Box<UnsafeCell<[T]>>> {}
 
 impl<T> From<UnsafeCellSlice<Box<UnsafeCell<[T]>>>> for Box<[T]> {
     #[inline(always)]
