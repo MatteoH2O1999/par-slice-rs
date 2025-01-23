@@ -1,9 +1,12 @@
 use crate::*;
 use std::{cell::UnsafeCell, mem::size_of, ops::Deref};
 
+/// Wrapper around an [`UnsafeCell`] (either mutable reference or owned).
 #[derive(Debug)]
 pub(crate) struct UnsafeCellSlice<B>(B);
 
+// Safety: access paradigms shift responsability to the user to ensure
+// no data races happen.
 unsafe impl<T: Send> Sync for UnsafeCellSlice<&mut UnsafeCell<[T]>> {}
 unsafe impl<T: Send> Sync for UnsafeCellSlice<Box<UnsafeCell<[T]>>> {}
 
@@ -22,6 +25,7 @@ impl<T> From<UnsafeCellSlice<Box<UnsafeCell<[T]>>>> for Vec<T> {
 }
 
 impl<'a, T> UnsafeCellSlice<&'a mut UnsafeCell<[T]>> {
+    /// Creates a new borrowed slice.
     #[inline(always)]
     pub(crate) fn new_borrowed(slice: &'a mut [T]) -> Self {
         Self(UnsafeCell::from_mut(slice))
@@ -29,6 +33,7 @@ impl<'a, T> UnsafeCellSlice<&'a mut UnsafeCell<[T]>> {
 }
 
 impl<T> UnsafeCellSlice<Box<UnsafeCell<[T]>>> {
+    /// Creates a new owned slice.
     #[inline(always)]
     pub(crate) fn new_owned(slice: Box<[T]>) -> Self {
         let ptr = Box::into_raw(slice) as *mut UnsafeCell<[T]>;
@@ -39,6 +44,7 @@ impl<T> UnsafeCellSlice<Box<UnsafeCell<[T]>>> {
         Self(boxed)
     }
 
+    /// Extracts the inner boxed slice from the wrapper.
     #[inline(always)]
     fn into_inner(self) -> Box<[T]> {
         let ptr = Box::into_raw(self.0) as *mut [T];

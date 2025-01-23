@@ -1,6 +1,8 @@
 use crate::*;
 use std::{cell::UnsafeCell, mem::size_of, ops::Deref};
 
+/// Wrapper around an [`UnsafeCell`] (either mutable reference or owned)
+/// that divides the underlying slice in chunks.
 #[derive(Debug)]
 pub(crate) struct UnsafeCellChunkSlice<B> {
     inner: B,
@@ -8,6 +10,8 @@ pub(crate) struct UnsafeCellChunkSlice<B> {
     chunk_size: usize,
 }
 
+// Safety: access paradigms shift responsability to the user to ensure
+// no data races happen.
 unsafe impl<T: Send> Sync for UnsafeCellChunkSlice<&mut UnsafeCell<[T]>> {}
 unsafe impl<T: Send> Sync for UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {}
 
@@ -26,6 +30,11 @@ impl<T> From<UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>> for Vec<T> {
 }
 
 impl<'a, T> UnsafeCellChunkSlice<&'a mut UnsafeCell<[T]>> {
+    /// Creates a new borrowed slice with chunks of `chunk_size`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `slice.len()` is not divisible by `chunk_size`.
     #[inline(always)]
     pub(crate) fn new_borrowed(slice: &'a mut [T], chunk_size: usize) -> Self {
         assert_eq!(slice.len() % chunk_size, 0);
@@ -40,6 +49,11 @@ impl<'a, T> UnsafeCellChunkSlice<&'a mut UnsafeCell<[T]>> {
 }
 
 impl<T> UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {
+    /// Creates a new owned slice with chunks of `chunk_size`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `slice.len()` is not divisible by `chunk_size`.
     #[inline(always)]
     pub(crate) fn new_owned(slice: Box<[T]>, chunk_size: usize) -> Self {
         assert_eq!(slice.len() % chunk_size, 0);
@@ -58,6 +72,7 @@ impl<T> UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {
         }
     }
 
+    /// Extracts the inner boxed slice from the wrapper.
     #[inline(always)]
     fn into_inner(self) -> Box<[T]> {
         let ptr = Box::into_raw(self.inner) as *mut [T];
