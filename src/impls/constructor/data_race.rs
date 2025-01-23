@@ -1,4 +1,4 @@
-use crate::{constructor::*, *};
+use crate::*;
 use std::fmt::Debug;
 
 pub struct DataRaceSlice;
@@ -22,7 +22,7 @@ impl DataRaceSlice {
 
     #[inline(always)]
     pub fn with_closure<T: Send>(
-        closure: impl FnMut() -> T,
+        closure: impl FnMut(usize) -> T,
         len: usize,
     ) -> impl UnsafeDataRaceAccess<T> + Into<Box<[T]>> + Sync + Debug {
         new_boxed_slice_with(len, closure).into_data_race_par_slice()
@@ -49,7 +49,7 @@ impl DataRaceSlice {
 
     #[inline(always)]
     pub fn chunks_with_closure<T: Send>(
-        closure: impl FnMut() -> T,
+        closure: impl FnMut(usize) -> T,
         len: usize,
         chunk_size: usize,
     ) -> impl UnsafeDataRaceChunkAccess<T> + Into<Box<[T]>> + Sync + Debug {

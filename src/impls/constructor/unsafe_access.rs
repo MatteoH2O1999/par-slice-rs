@@ -1,4 +1,4 @@
-use crate::{constructor::*, *};
+use crate::*;
 use std::fmt::Debug;
 
 pub struct UnsafeParSlice;
@@ -22,7 +22,7 @@ impl UnsafeParSlice {
 
     #[inline(always)]
     pub fn with_closure<T: Send>(
-        closure: impl FnMut() -> T,
+        closure: impl FnMut(usize) -> T,
         len: usize,
     ) -> impl UnsafeAccess<T> + Into<Box<[T]>> + Sync + Debug {
         new_boxed_slice_with(len, closure).into_unsafe_par_slice()
@@ -49,7 +49,7 @@ impl UnsafeParSlice {
 
     #[inline(always)]
     pub fn chunks_with_closure<T: Send>(
-        closure: impl FnMut() -> T,
+        closure: impl FnMut(usize) -> T,
         len: usize,
         chunk_size: usize,
     ) -> impl UnsafeChunkAccess<T> + Into<Box<[T]>> + Sync + Debug {

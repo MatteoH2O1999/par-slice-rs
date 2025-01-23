@@ -2,7 +2,8 @@ mod collection;
 
 mod conversion;
 
-pub mod constructor;
+mod constructor;
+pub use constructor::*;
 
 mod unsafe_cell_chunk_slice;
 pub(crate) use unsafe_cell_chunk_slice::*;
