@@ -135,7 +135,7 @@ jobs:
           git diff --exit-code
 
   publish:
-    needs: [api, docs, lint, tests]
+    needs: [api, docs, lint, tests, miri]
     name: Publish release
     runs-on: ubuntu-latest
     steps:
