@@ -20,7 +20,7 @@ fn no_thread_unchecked() {
         slice.set_unchecked(1, &[42, 69]);
     }
 
-    assert_eq!(slice.into().as_ref(), vec![1, 2, 42, 69]);
+    assert_eq!(slice.into(), vec![1, 2, 42, 69]);
 }
 
 #[test]
@@ -32,7 +32,7 @@ fn no_thread_checked() {
         slice.set(1, &[42, 69]);
     }
 
-    assert_eq!(slice.into().as_ref(), vec![1, 2, 42, 69]);
+    assert_eq!(slice.into(), vec![1, 2, 42, 69]);
 }
 
 #[test]
@@ -88,7 +88,7 @@ fn single_thread_unchecked() {
         .unwrap();
     });
 
-    assert_eq!(slice.into().as_ref(), vec![1, 2, 42, 69]);
+    assert_eq!(slice.into(), vec![1, 2, 42, 69]);
 }
 
 #[test]
@@ -108,7 +108,7 @@ fn single_thread_checked() {
         .unwrap();
     });
 
-    assert_eq!(slice.into().as_ref(), vec![1, 2, 42, 69]);
+    assert_eq!(slice.into(), vec![1, 2, 42, 69]);
 }
 
 #[test]
@@ -128,7 +128,7 @@ fn single_thread_checked_panic_get() {
         .unwrap();
     });
 
-    assert_eq!(slice.into().as_ref(), vec![1, 2, 42, 69]);
+    assert_eq!(slice.into(), vec![1, 2, 42, 69]);
 }
 
 #[test]
@@ -148,7 +148,7 @@ fn single_thread_checked_panic_set() {
         .unwrap_err();
     });
 
-    assert_eq!(slice.into().as_ref(), vec![1, 2, 3, 4]);
+    assert_eq!(slice.into(), vec![1, 2, 3, 4]);
 }
 
 //
@@ -168,7 +168,7 @@ fn multithread_unchecked() {
         });
     });
 
-    assert_eq!(slice.into().as_ref(), vec![1, 2, 42, 69]);
+    assert_eq!(slice.into(), vec![1, 2, 42, 69]);
 }
 
 #[test]
@@ -184,7 +184,7 @@ fn multithread_checked() {
         });
     });
 
-    assert_eq!(slice.into().as_ref(), vec![1, 2, 42, 69]);
+    assert_eq!(slice.into(), vec![1, 2, 42, 69]);
 }
 
 #[test]
@@ -202,7 +202,7 @@ fn multithread_checked_panic_get() {
         .unwrap_err();
     });
 
-    assert_eq!(slice.into().as_ref(), vec![1, 2, 42, 69]);
+    assert_eq!(slice.into(), vec![1, 2, 42, 69]);
 }
 
 #[test]
@@ -220,5 +220,5 @@ fn multithread_checked_panic_mut() {
         .unwrap_err();
     });
 
-    assert_eq!(slice.into().as_ref(), vec![1, 2, 3, 4]);
+    assert_eq!(slice.into(), vec![1, 2, 3, 4]);
 }
