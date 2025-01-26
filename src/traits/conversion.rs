@@ -1,5 +1,4 @@
 use crate::*;
-use std::fmt::Debug;
 
 /// View of a collection that allows unsynchronized access to its elements.
 ///
@@ -114,7 +113,7 @@ pub unsafe trait ParSliceView<T> {
     ///
     /// assert_eq!(collection, vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);
     /// ```
-    fn as_pointer_par_slice(&mut self) -> impl PointerAccess<T> + Sync + Debug;
+    fn as_pointer_par_slice(&mut self) -> impl PointerAccess<T> + ParView;
 
     /// Returns a view of the collection that allows unsynchronized access to its
     /// elements through setters and getters.
@@ -136,7 +135,7 @@ pub unsafe trait ParSliceView<T> {
     ///
     /// assert_eq!(collection, vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);
     /// ```
-    fn as_data_race_par_slice(&mut self) -> impl UnsafeDataRaceAccess<T> + Sync + Debug;
+    fn as_data_race_par_slice(&mut self) -> impl UnsafeDataRaceAccess<T> + ParView;
 
     /// Returns a view of the collection that allows unsynchronized access to its
     /// elements through references.
@@ -159,7 +158,7 @@ pub unsafe trait ParSliceView<T> {
     ///
     /// assert_eq!(collection, vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);
     /// ```
-    fn as_unsafe_par_slice(&mut self) -> impl UnsafeAccess<T> + Sync + Debug;
+    fn as_unsafe_par_slice(&mut self) -> impl UnsafeAccess<T> + ParView;
 
     /// Returns a view of the collection that allows unsynchronized access to
     /// chunks of `chunk_size` of its elements through pointers.
@@ -190,7 +189,7 @@ pub unsafe trait ParSliceView<T> {
     fn as_pointer_par_chunk_slice(
         &mut self,
         chunk_size: usize,
-    ) -> impl PointerChunkAccess<T> + Sync + Debug;
+    ) -> impl PointerChunkAccess<T> + ParView;
 
     /// Returns a view of the collection that allows unsynchronized access to
     /// chunks of `chunk_size` of its elements through setters and getters.
@@ -219,7 +218,7 @@ pub unsafe trait ParSliceView<T> {
     fn as_data_race_par_chunk_slice(
         &mut self,
         chunk_size: usize,
-    ) -> impl UnsafeDataRaceChunkAccess<T> + Sync + Debug;
+    ) -> impl UnsafeDataRaceChunkAccess<T> + ParView;
 
     /// Returns a view of the collection that allows unsynchronized access to
     /// chunks of `chunk_size` of its elements through references.
@@ -248,7 +247,7 @@ pub unsafe trait ParSliceView<T> {
     fn as_unsafe_par_chunk_slice(
         &mut self,
         chunk_size: usize,
-    ) -> impl UnsafeChunkAccess<T> + Sync + Debug;
+    ) -> impl UnsafeChunkAccess<T> + ParView;
 }
 
 /// A value-to-value conversion that consumes the input collection and produces one
@@ -364,7 +363,7 @@ pub unsafe trait IntoParSlice<T>: Sized {
     ///
     /// assert_eq!(collection.into(), vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);
     /// ```
-    fn into_pointer_par_slice(self) -> impl PointerAccess<T> + Into<Self> + Sync + Debug;
+    fn into_pointer_par_slice(self) -> impl PointerAccess<T> + ParCollection<Self>;
 
     /// Converts the collection into one that allows unsynchronized access to its
     /// elements through setters and getters.
@@ -383,7 +382,7 @@ pub unsafe trait IntoParSlice<T>: Sized {
     ///
     /// assert_eq!(collection.into(), vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);
     /// ```
-    fn into_data_race_par_slice(self) -> impl UnsafeDataRaceAccess<T> + Into<Self> + Sync + Debug;
+    fn into_data_race_par_slice(self) -> impl UnsafeDataRaceAccess<T> + ParCollection<Self>;
 
     /// Converts the collection into one that allows unsynchronized access to its
     /// elements through references.
@@ -403,7 +402,7 @@ pub unsafe trait IntoParSlice<T>: Sized {
     ///
     /// assert_eq!(collection.into(), vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);
     /// ```
-    fn into_unsafe_par_slice(self) -> impl UnsafeAccess<T> + Into<Self> + Sync + Debug;
+    fn into_unsafe_par_slice(self) -> impl UnsafeAccess<T> + ParCollection<Self>;
 
     /// Converts the collection into one that allows unsynchronized access to
     /// chunks of `chunk_size` of its elements through pointers.
@@ -431,7 +430,7 @@ pub unsafe trait IntoParSlice<T>: Sized {
     fn into_pointer_par_chunk_slice(
         self,
         chunk_size: usize,
-    ) -> impl PointerChunkAccess<T> + Into<Self> + Sync + Debug;
+    ) -> impl PointerChunkAccess<T> + ParCollection<Self>;
 
     /// Converts the collection into one that allows unsynchronized access to
     /// chunks of `chunk_size` of its elements through setters and getters.
@@ -457,7 +456,7 @@ pub unsafe trait IntoParSlice<T>: Sized {
     fn into_data_race_par_chunk_slice(
         self,
         chunk_size: usize,
-    ) -> impl UnsafeDataRaceChunkAccess<T> + Into<Self> + Sync + Debug;
+    ) -> impl UnsafeDataRaceChunkAccess<T> + ParCollection<Self>;
 
     /// Converts the collection into one that allows unsynchronized access to
     /// chunks of `chunk_size` of its elements through references.
@@ -483,5 +482,5 @@ pub unsafe trait IntoParSlice<T>: Sized {
     fn into_unsafe_par_chunk_slice(
         self,
         chunk_size: usize,
-    ) -> impl UnsafeChunkAccess<T> + Into<Self> + Sync + Debug;
+    ) -> impl UnsafeChunkAccess<T> + ParCollection<Self>;
 }

@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 /// A sized collection.
 ///
 /// This trait can be trusted by unsafe code thanks to the invariants below.
@@ -100,6 +102,18 @@ pub unsafe trait TrustedChunkSizedCollection: TrustedSizedCollection {
         self.len()
     }
 }
+
+/// Traits common to parallel views on collections.
+pub trait ParView: Sync + Debug {}
+
+impl<T: Sync + Debug> ParView for T {}
+
+/// Traits common to parallel collections.
+///
+/// `C` is the wrapped collection.
+pub trait ParCollection<C>: Into<C> + ParView {}
+
+impl<C, T: Into<C> + ParView> ParCollection<C> for T {}
 
 /// Asserts that `index` is between `0` and `len - 1`, panicking otherwise.
 #[inline(always)]
