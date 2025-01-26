@@ -7,8 +7,8 @@ pub(crate) struct UnsafeCellSlice<B>(B);
 
 // Safety: access paradigms shift responsability to the user to ensure
 // no data races happen.
-unsafe impl<T: Send> Sync for UnsafeCellSlice<&mut UnsafeCell<[T]>> {}
-unsafe impl<T: Send> Sync for UnsafeCellSlice<Box<UnsafeCell<[T]>>> {}
+unsafe impl<T: Send + Sync> Sync for UnsafeCellSlice<&mut UnsafeCell<[T]>> {}
+unsafe impl<T: Send + Sync> Sync for UnsafeCellSlice<Box<UnsafeCell<[T]>>> {}
 
 impl<T> From<UnsafeCellSlice<Box<UnsafeCell<[T]>>>> for Box<[T]> {
     #[inline(always)]

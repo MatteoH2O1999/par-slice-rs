@@ -1,6 +1,6 @@
 use crate::*;
 
-unsafe impl<T: Send> ParSliceView<T> for [T] {
+unsafe impl<T: Send + Sync> ParSliceView<T> for [T] {
     #[inline(always)]
     fn as_pointer_par_slice(&mut self) -> impl PointerAccess<T> + ParView {
         UnsafeCellSlice::new_borrowed(self)
@@ -44,7 +44,7 @@ unsafe impl<T: Send> ParSliceView<T> for [T] {
     }
 }
 
-unsafe impl<T: Send> IntoParSlice<T> for Box<[T]> {
+unsafe impl<T: Send + Sync> IntoParSlice<T> for Box<[T]> {
     #[inline(always)]
     fn into_pointer_par_slice(self) -> impl PointerAccess<T> + ParCollection<Self> {
         UnsafeCellSlice::new_owned(self)
@@ -88,7 +88,7 @@ unsafe impl<T: Send> IntoParSlice<T> for Box<[T]> {
     }
 }
 
-unsafe impl<T: Send> IntoParSlice<T> for Vec<T> {
+unsafe impl<T: Send + Sync> IntoParSlice<T> for Vec<T> {
     #[inline(always)]
     fn into_pointer_par_slice(self) -> impl PointerAccess<T> + ParCollection<Self> {
         UnsafeCellSlice::new_owned(self.into_boxed_slice())

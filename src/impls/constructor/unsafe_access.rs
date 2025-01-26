@@ -24,7 +24,7 @@ impl UnsafeParSlice {
     /// ```
     #[allow(clippy::new_ret_no_self)]
     #[inline(always)]
-    pub fn new<T: Default + Send>(
+    pub fn new<T: Default + Send + Sync>(
         len: usize,
     ) -> impl UnsafeAccess<T> + Into<Box<[T]>> + Sync + Debug {
         new_boxed_slice(len).into_unsafe_par_slice()
@@ -47,7 +47,7 @@ impl UnsafeParSlice {
     /// assert_eq!(unsafe_slice.into().as_ref(), &[42, 69, 69, 69]);
     /// ```
     #[inline(always)]
-    pub fn with_value<T: Clone + Send>(
+    pub fn with_value<T: Clone + Send + Sync>(
         value: T,
         len: usize,
     ) -> impl UnsafeAccess<T> + Into<Box<[T]>> + Sync + Debug {
@@ -72,7 +72,7 @@ impl UnsafeParSlice {
     /// assert_eq!(unsafe_slice.into().as_ref(), &[42, 1, 2, 3]);
     /// ```
     #[inline(always)]
-    pub fn with_closure<T: Send>(
+    pub fn with_closure<T: Send + Sync>(
         closure: impl FnMut(usize) -> T,
         len: usize,
     ) -> impl UnsafeAccess<T> + Into<Box<[T]>> + Sync + Debug {
@@ -96,7 +96,7 @@ impl UnsafeParSlice {
     /// assert_eq!(unsafe_slice.into().as_ref(), &[42, 0, 0, 0]);
     /// ```
     #[inline(always)]
-    pub fn new_chunks<T: Default + Send>(
+    pub fn new_chunks<T: Default + Send + Sync>(
         len: usize,
         chunk_size: usize,
     ) -> impl UnsafeChunkAccess<T> + Into<Box<[T]>> + Sync + Debug {
@@ -121,7 +121,7 @@ impl UnsafeParSlice {
     /// assert_eq!(unsafe_slice.into().as_ref(), &[42, 69, 69, 69]);
     /// ```
     #[inline(always)]
-    pub fn chunks_with_value<T: Clone + Send>(
+    pub fn chunks_with_value<T: Clone + Send + Sync>(
         value: T,
         len: usize,
         chunk_size: usize,
@@ -148,7 +148,7 @@ impl UnsafeParSlice {
     /// assert_eq!(unsafe_slice.into().as_ref(), &[42, 1, 2, 3]);
     /// ```
     #[inline(always)]
-    pub fn chunks_with_closure<T: Send>(
+    pub fn chunks_with_closure<T: Send + Sync>(
         closure: impl FnMut(usize) -> T,
         len: usize,
         chunk_size: usize,

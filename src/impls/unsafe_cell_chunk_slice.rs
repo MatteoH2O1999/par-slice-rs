@@ -12,8 +12,8 @@ pub(crate) struct UnsafeCellChunkSlice<B> {
 
 // Safety: access paradigms shift responsability to the user to ensure
 // no data races happen.
-unsafe impl<T: Send> Sync for UnsafeCellChunkSlice<&mut UnsafeCell<[T]>> {}
-unsafe impl<T: Send> Sync for UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {}
+unsafe impl<T: Send + Sync> Sync for UnsafeCellChunkSlice<&mut UnsafeCell<[T]>> {}
+unsafe impl<T: Send + Sync> Sync for UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {}
 
 impl<T> From<UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>> for Box<[T]> {
     #[inline(always)]
