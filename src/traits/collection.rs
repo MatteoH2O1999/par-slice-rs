@@ -104,9 +104,9 @@ pub unsafe trait TrustedChunkSizedCollection: TrustedSizedCollection {
 }
 
 /// Traits common to parallel views on collections.
-pub trait ParView: Sync + Debug {}
+pub trait ParView: Send + Sync + Debug {}
 
-impl<T: Sync + Debug> ParView for T {}
+impl<T: Send + Sync + Debug> ParView for T {}
 
 /// Traits common to parallel collections.
 ///
