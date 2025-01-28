@@ -279,7 +279,7 @@ pub unsafe trait UnsafeDataRaceAccess<T: ?Sized>: TrustedSizedCollection {
 /// * For each index `i`, `collection.get_unchecked(i)` returns a [`Box`] containing a bitwise copy of the chunk of elements
 ///   identified by index `i` in the collection. It is up to the caller to ensure no data races can happen during the read.
 /// * For each index `i`, `collection.set(i, value)` sets the chunk of elements identified by index `i` in the collection to `value`,
-///   panicking whenever `i` is out of bounds or `value`` has not the same size as [`chunk_size`](`TrustedChunkSizedCollection::chunk_size`).
+///   panicking whenever `i` is out of bounds or `value` has not the same size as [`chunk_size`](`TrustedChunkSizedCollection::chunk_size`).
 ///   It is still up to the caller to ensure no data races can happen during the write.
 /// * For each index `i`, `collection.set_unchecked(i, value)` sets the chunk of elements identified by index `i` in the collection to `value`.
 ///   It is up to the caller to ensure no data races can happen during the write and that `value`` is a chunk of the correct length.
