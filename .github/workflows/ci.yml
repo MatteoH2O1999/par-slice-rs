@@ -151,7 +151,7 @@ jobs:
           profile: minimal
       - name: Test publishing
         if: ${{ github.event_name != 'release' }}
-        run: cargo publish --dry-run
+        run: cargo publish --dry-run -v
       - name: Publish package
         if: ${{ github.event_name == 'release' }}
         run: cargo publish
