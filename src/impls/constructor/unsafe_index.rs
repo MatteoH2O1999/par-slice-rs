@@ -2,9 +2,9 @@ use crate::*;
 
 /// Utility struct for contructors for slices that allow unsynchronized access
 /// to their elements through [`UnsafeIndex`] and [`UnsafeChunkIndex`].
-pub struct UnsafeParSlice;
+pub struct ParSlice;
 
-impl UnsafeParSlice {
+impl ParSlice {
     /// Constructs a new slice with `len` elements, each initialized
     /// to [`T::default`](`Default::default`), that allows unsynchronized
     /// access to its elements through [`UnsafeIndex`] and that can be
@@ -13,7 +13,7 @@ impl UnsafeParSlice {
     /// # Examples
     /// ```
     /// # use par_slice::*;
-    /// let unsafe_slice = UnsafeParSlice::new(4);
+    /// let unsafe_slice = ParSlice::new(4);
     ///
     /// unsafe {
     ///     *unsafe_slice.get_mut(0) = 42;
@@ -37,7 +37,7 @@ impl UnsafeParSlice {
     /// # Examples
     /// ```
     /// # use par_slice::*;
-    /// let unsafe_slice = UnsafeParSlice::with_value(69, 4);
+    /// let unsafe_slice = ParSlice::with_value(69, 4);
     ///
     /// unsafe {
     ///     *unsafe_slice.get_mut(0) = 42;
@@ -62,7 +62,7 @@ impl UnsafeParSlice {
     /// # Examples
     /// ```
     /// # use par_slice::*;
-    /// let unsafe_slice = UnsafeParSlice::with_closure(|i| i, 4);
+    /// let unsafe_slice = ParSlice::with_closure(|i| i, 4);
     ///
     /// unsafe {
     ///     *unsafe_slice.get_mut(0) = 42;
@@ -86,7 +86,7 @@ impl UnsafeParSlice {
     /// # Examples
     /// ```
     /// # use par_slice::*;
-    /// let unsafe_slice = UnsafeParSlice::new_chunks(4, 2);
+    /// let unsafe_slice = ParSlice::new_chunks(4, 2);
     ///
     /// unsafe {
     ///     unsafe_slice.get_mut(0)[0] = 42;
@@ -111,7 +111,7 @@ impl UnsafeParSlice {
     /// # Examples
     /// ```
     /// # use par_slice::*;
-    /// let unsafe_slice = UnsafeParSlice::chunks_with_value(69, 4, 2);
+    /// let unsafe_slice = ParSlice::chunks_with_value(69, 4, 2);
     ///
     /// unsafe {
     ///     unsafe_slice.get_mut(0)[0] = 42;
@@ -138,7 +138,7 @@ impl UnsafeParSlice {
     /// # Examples
     /// ```
     /// # use par_slice::*;
-    /// let unsafe_slice = UnsafeParSlice::chunks_with_closure(|i| i, 4, 2);
+    /// let unsafe_slice = ParSlice::chunks_with_closure(|i| i, 4, 2);
     ///
     /// unsafe {
     ///     unsafe_slice.get_mut(0)[0] = 42;
