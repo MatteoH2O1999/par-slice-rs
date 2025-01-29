@@ -22,7 +22,7 @@ impl NoRefParSlice {
     /// assert_eq!(data_race_slice.into().as_ref(), &[42, 0, 0, 0]);
     /// ```
     #[allow(clippy::new_ret_no_self)]
-    #[inline(always)]
+    #[inline]
     pub fn new<T: Default + Send + Sync>(
         len: usize,
     ) -> impl UnsafeNoRefIndex<T> + ParCollection<Box<[T]>> {
@@ -45,7 +45,7 @@ impl NoRefParSlice {
     ///
     /// assert_eq!(data_race_slice.into().as_ref(), &[42, 69, 69, 69]);
     /// ```
-    #[inline(always)]
+    #[inline]
     pub fn with_value<T: Clone + Send + Sync>(
         value: T,
         len: usize,
@@ -70,7 +70,7 @@ impl NoRefParSlice {
     ///
     /// assert_eq!(data_race_slice.into().as_ref(), &[42, 1, 2, 3]);
     /// ```
-    #[inline(always)]
+    #[inline]
     pub fn with_closure<T: Send + Sync>(
         closure: impl FnMut(usize) -> T,
         len: usize,
@@ -94,7 +94,7 @@ impl NoRefParSlice {
     ///
     /// assert_eq!(data_race_slice.into().as_ref(), &[42, 0, 0, 0]);
     /// ```
-    #[inline(always)]
+    #[inline]
     pub fn new_chunks<T: Default + Send + Sync>(
         len: usize,
         chunk_size: usize,
@@ -119,7 +119,7 @@ impl NoRefParSlice {
     ///
     /// assert_eq!(data_race_slice.into().as_ref(), &[42, 69, 69, 69]);
     /// ```
-    #[inline(always)]
+    #[inline]
     pub fn chunks_with_value<T: Clone + Send + Sync>(
         value: T,
         len: usize,
@@ -146,7 +146,7 @@ impl NoRefParSlice {
     ///
     /// assert_eq!(data_race_slice.into().as_ref(), &[42, 1, 2, 3]);
     /// ```
-    #[inline(always)]
+    #[inline]
     pub fn chunks_with_closure<T: Send + Sync>(
         closure: impl FnMut(usize) -> T,
         len: usize,

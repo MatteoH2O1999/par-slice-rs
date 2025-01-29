@@ -154,7 +154,7 @@ pub unsafe trait UnsafeIndex<T: ?Sized>: TrustedSizedCollection {
     /// let ref_0: &usize = unsafe { collection.get(0) };
     /// assert_eq!(*ref_0, 0);
     /// ```
-    #[inline(always)]
+    #[inline]
     unsafe fn get(&self, index: usize) -> &T {
         assert_in_bounds(self.len(), index);
         unsafe {
@@ -212,7 +212,7 @@ pub unsafe trait UnsafeIndex<T: ?Sized>: TrustedSizedCollection {
     /// assert_eq!(unsafe { *collection.get(0) }, 42);
     /// ```
     #[allow(clippy::mut_from_ref)]
-    #[inline(always)]
+    #[inline]
     unsafe fn get_mut(&self, index: usize) -> &mut T {
         assert_in_bounds(self.len(), index);
         unsafe {

@@ -31,7 +31,7 @@ pub(crate) fn new_boxed_slice_with_value<T: Clone>(len: usize, value: T) -> Box<
 
 /// Creates a new boxed slice of `len` elements, each initialized to
 /// [`T::default`](`Default::default`).
-#[inline(always)]
+#[inline]
 pub(crate) fn new_boxed_slice<T: Default>(len: usize) -> Box<[T]> {
     new_boxed_slice_with(len, |_| T::default())
 }

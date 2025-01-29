@@ -16,14 +16,14 @@ unsafe impl<T: Send + Sync> Sync for UnsafeCellChunkSlice<&mut UnsafeCell<[T]>> 
 unsafe impl<T: Send + Sync> Sync for UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {}
 
 impl<T> From<UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>> for Box<[T]> {
-    #[inline(always)]
+    #[inline]
     fn from(value: UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>) -> Self {
         value.into_inner()
     }
 }
 
 impl<T> From<UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>> for Vec<T> {
-    #[inline(always)]
+    #[inline]
     fn from(value: UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>) -> Self {
         value.into_inner().into_vec()
     }
@@ -83,7 +83,7 @@ impl<T> UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {
 unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedSizedCollection
     for UnsafeCellChunkSlice<B>
 {
-    #[inline(always)]
+    #[inline]
     fn len(&self) -> usize {
         self.len
     }
@@ -92,29 +92,29 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedSizedCollection
 unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedChunkSizedCollection
     for UnsafeCellChunkSlice<B>
 {
-    #[inline(always)]
+    #[inline]
     fn chunk_size(&self) -> usize {
         self.chunk_size
     }
 
-    #[inline(always)]
+    #[inline]
     fn num_elements(&self) -> usize {
         self.inner.get().len()
     }
 
-    #[inline(always)]
+    #[inline]
     fn num_chunks(&self) -> usize {
         self.len
     }
 }
 
 unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerIndex<[T]> for UnsafeCellChunkSlice<B> {
-    #[inline(always)]
+    #[inline]
     unsafe fn get_ptr_unchecked(&self, index: usize) -> *const [T] {
         self.get_mut_ptr_unchecked(index) as *const [T]
     }
 
-    #[inline(always)]
+    #[inline]
     unsafe fn get_mut_ptr_unchecked(&self, index: usize) -> *mut [T] {
         debug_assert!(index < self.len());
 
@@ -139,7 +139,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerChunkIndex<T>
 unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeNoRefChunkIndex<T>
     for UnsafeCellChunkSlice<B>
 {
-    #[inline(always)]
+    #[inline]
     unsafe fn get_unchecked<O: AsMut<[T]>>(&self, index: usize, mut out: O) -> O
     where
         T: Copy,
@@ -166,7 +166,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeNoRefChunkIndex<T>
         out
     }
 
-    #[inline(always)]
+    #[inline]
     unsafe fn set_unchecked(&self, index: usize, value: &[T])
     where
         T: Clone,
@@ -190,7 +190,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeNoRefChunkIndex<T>
 }
 
 unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeIndex<[T]> for UnsafeCellChunkSlice<B> {
-    #[inline(always)]
+    #[inline]
     unsafe fn get_unchecked(&self, index: usize) -> &[T] {
         unsafe {
             // Safety: the caller guarantees Rust's aliasing rules are respected and that
@@ -199,7 +199,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeIndex<[T]> for UnsafeCe
         }
     }
 
-    #[inline(always)]
+    #[inline]
     unsafe fn get_mut_unchecked(&self, index: usize) -> &mut [T] {
         unsafe {
             // Safety: the caller guarantees Rust's aliasing rules are respected and that

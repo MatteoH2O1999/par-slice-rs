@@ -39,7 +39,7 @@ pub unsafe trait TrustedSizedCollection {
     ///     assert!(!collection.is_empty());
     /// }
     /// ```
-    #[inline(always)]
+    #[inline]
     fn is_empty(&self) -> bool {
         self.len() == 0
     }
@@ -80,7 +80,7 @@ pub unsafe trait TrustedChunkSizedCollection: TrustedSizedCollection {
     /// let collection = vec![0; 20].into_par_chunk_index(5);
     /// assert_eq!(collection.num_elements(), 20);
     /// ```
-    #[inline(always)]
+    #[inline]
     fn num_elements(&self) -> usize {
         self.num_chunks() * self.chunk_size()
     }
@@ -97,7 +97,7 @@ pub unsafe trait TrustedChunkSizedCollection: TrustedSizedCollection {
     /// assert_eq!(collection.num_chunks(), 4);
     /// assert_eq!(collection.len(), 4);
     /// ```
-    #[inline(always)]
+    #[inline]
     fn num_chunks(&self) -> usize {
         self.len()
     }
@@ -116,7 +116,7 @@ pub trait ParCollection<C>: Into<C> + ParView {}
 impl<C, T: Into<C> + ParView> ParCollection<C> for T {}
 
 /// Asserts that `index` is between `0` and `len - 1`, panicking otherwise.
-#[inline(always)]
+#[inline]
 pub(crate) fn assert_in_bounds(len: usize, index: usize) {
     assert!(
         index < len,
@@ -127,7 +127,7 @@ pub(crate) fn assert_in_bounds(len: usize, index: usize) {
 }
 
 /// Asserts that `chunk.len()` is equal to `chunk_size`, panicking otherwise
-#[inline(always)]
+#[inline]
 pub(crate) fn assert_chunk_compatible<T>(chunk_size: usize, chunk: &[T]) {
     assert!(
         chunk.len() == chunk_size,
@@ -139,7 +139,7 @@ pub(crate) fn assert_chunk_compatible<T>(chunk_size: usize, chunk: &[T]) {
 
 /// Asserts that a collection of size `len` can be split exactly in chunks of size `chunk_size`,
 /// panicking if this is not true.
-#[inline(always)]
+#[inline]
 pub(crate) fn assert_chunk_size(len: usize, chunk_size: usize) {
     assert!(
         len % chunk_size == 0,

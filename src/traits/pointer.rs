@@ -173,7 +173,7 @@ pub unsafe trait PointerIndex<T: ?Sized>: TrustedSizedCollection {
     /// // No other reference exists so we may dereference ptr_0 safely
     /// assert_eq!(unsafe { *ptr_0 }, 0);
     /// ```
-    #[inline(always)]
+    #[inline]
     fn get_ptr(&self, index: usize) -> *const T {
         assert_in_bounds(self.len(), index);
         unsafe {
@@ -202,7 +202,7 @@ pub unsafe trait PointerIndex<T: ?Sized>: TrustedSizedCollection {
     /// unsafe { *ptr_0 = 42 };
     /// assert_eq!(unsafe { *collection.get_ptr(0) }, 42);
     /// ```
-    #[inline(always)]
+    #[inline]
     fn get_mut_ptr(&self, index: usize) -> *mut T {
         assert_in_bounds(self.len(), index);
         unsafe {

@@ -154,7 +154,7 @@ pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
     /// // This is single threaded so no data races can happen
     /// assert_eq!(unsafe { collection.get(0) }, 0);
     /// ```
-    #[inline(always)]
+    #[inline]
     unsafe fn get(&self, index: usize) -> T
     where
         T: Copy,
@@ -217,7 +217,7 @@ pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
     ///
     /// assert_eq!(collection.into(), vec![42, 0, 0, 0, 0]);
     /// ```
-    #[inline(always)]
+    #[inline]
     unsafe fn set(&self, index: usize, value: T)
     where
         T: Sized,
@@ -424,7 +424,7 @@ pub unsafe trait UnsafeNoRefChunkIndex<T>: TrustedChunkSizedCollection {
     ///
     /// assert_eq!(buf, vec![0, 0]);
     /// ```
-    #[inline(always)]
+    #[inline]
     unsafe fn get<O: AsMut<[T]>>(&self, index: usize, mut out: O) -> O
     where
         T: Copy,
@@ -495,7 +495,7 @@ pub unsafe trait UnsafeNoRefChunkIndex<T>: TrustedChunkSizedCollection {
     ///
     /// assert_eq!(collection.into(), vec![42, 69, 0, 0, 0, 0, 0, 0, 0, 0]);
     /// ```
-    #[inline(always)]
+    #[inline]
     unsafe fn set(&self, index: usize, value: &[T])
     where
         T: Clone,
