@@ -154,6 +154,7 @@ pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
     /// // This is single threaded so no data races can happen
     /// assert_eq!(unsafe { collection.get(0) }, 0);
     /// ```
+    #[inline(always)]
     unsafe fn get(&self, index: usize) -> T
     where
         T: Copy,
@@ -216,6 +217,7 @@ pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
     ///
     /// assert_eq!(collection.into(), vec![42, 0, 0, 0, 0]);
     /// ```
+    #[inline(always)]
     unsafe fn set(&self, index: usize, value: T)
     where
         T: Sized,

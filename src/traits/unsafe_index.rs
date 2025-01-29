@@ -154,6 +154,7 @@ pub unsafe trait UnsafeIndex<T: ?Sized>: TrustedSizedCollection {
     /// let ref_0: &usize = unsafe { collection.get(0) };
     /// assert_eq!(*ref_0, 0);
     /// ```
+    #[inline(always)]
     unsafe fn get(&self, index: usize) -> &T {
         assert_in_bounds(self.len(), index);
         unsafe {
