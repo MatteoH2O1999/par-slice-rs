@@ -392,7 +392,7 @@ pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
 ///
 /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
 pub unsafe trait UnsafeNoRefChunkIndex<T>: TrustedChunkSizedCollection {
-    /// Returns a [`Box`] containing a bitwise copy of the chunk of elements identified by `index` in
+    /// Sets `out` to a bitwise copy of the chunk of elements identified by `index` in
     /// the collection.
     ///
     /// This method performs bounds checking on `index` to ensure its validity.
@@ -435,7 +435,7 @@ pub unsafe trait UnsafeNoRefChunkIndex<T>: TrustedChunkSizedCollection {
         }
     }
 
-    /// Returns a [`Box`] containing a bitwise copy of the element identified by `index` in the collection,
+    /// Sets `out` to a bitwise copy of the chunk of elements identified by `index` in the collection,
     /// without performing bounds checking.
     ///
     /// This method does not perform bounds checking on `index` to ensure its validity.
