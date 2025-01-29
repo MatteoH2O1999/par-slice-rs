@@ -1,132 +1,129 @@
 use crate::*;
 
-unsafe impl<T: Send + Sync> ParSliceView<T> for [T] {
+unsafe impl<T: Send + Sync> ParIndexView<T> for [T] {
     #[inline(always)]
-    fn as_pointer_par_slice(&mut self) -> impl PointerAccess<T> + ParView {
+    fn as_pointer_par_index(&mut self) -> impl PointerIndex<T> + ParView {
         UnsafeCellSlice::new_borrowed(self)
     }
 
     #[inline(always)]
-    fn as_data_race_par_slice(&mut self) -> impl UnsafeDataRaceAccess<T> + ParView {
+    fn as_par_index_no_ref(&mut self) -> impl UnsafeNoRefIndex<T> + ParView {
         UnsafeCellSlice::new_borrowed(self)
     }
 
     #[inline(always)]
-    fn as_unsafe_par_slice(&mut self) -> impl UnsafeAccess<T> + ParView {
+    fn as_par_index(&mut self) -> impl UnsafeIndex<T> + ParView {
         UnsafeCellSlice::new_borrowed(self)
     }
 
     #[inline(always)]
-    fn as_pointer_par_chunk_slice(
+    fn as_pointer_par_chunk_index(
         &mut self,
         chunk_size: usize,
-    ) -> impl PointerChunkAccess<T> + ParView {
+    ) -> impl PointerChunkIndex<T> + ParView {
         assert_chunk_size(self.len(), chunk_size);
         UnsafeCellChunkSlice::new_borrowed(self, chunk_size)
     }
 
     #[inline(always)]
-    fn as_data_race_par_chunk_slice(
+    fn as_par_chunk_index_no_ref(
         &mut self,
         chunk_size: usize,
-    ) -> impl UnsafeDataRaceChunkAccess<T> + ParView {
+    ) -> impl UnsafeNoRefChunkIndex<T> + ParView {
         assert_chunk_size(self.len(), chunk_size);
         UnsafeCellChunkSlice::new_borrowed(self, chunk_size)
     }
 
     #[inline(always)]
-    fn as_unsafe_par_chunk_slice(
-        &mut self,
-        chunk_size: usize,
-    ) -> impl UnsafeChunkAccess<T> + ParView {
+    fn as_par_chunk_index(&mut self, chunk_size: usize) -> impl UnsafeChunkIndex<T> + ParView {
         assert_chunk_size(self.len(), chunk_size);
         UnsafeCellChunkSlice::new_borrowed(self, chunk_size)
     }
 }
 
-unsafe impl<T: Send + Sync> IntoParSlice<T> for Box<[T]> {
+unsafe impl<T: Send + Sync> IntoParIndex<T> for Box<[T]> {
     #[inline(always)]
-    fn into_pointer_par_slice(self) -> impl PointerAccess<T> + ParCollection<Self> {
+    fn into_pointer_par_index(self) -> impl PointerIndex<T> + ParCollection<Self> {
         UnsafeCellSlice::new_owned(self)
     }
 
     #[inline(always)]
-    fn into_data_race_par_slice(self) -> impl UnsafeDataRaceAccess<T> + ParCollection<Self> {
+    fn into_par_index_no_ref(self) -> impl UnsafeNoRefIndex<T> + ParCollection<Self> {
         UnsafeCellSlice::new_owned(self)
     }
 
     #[inline(always)]
-    fn into_unsafe_par_slice(self) -> impl UnsafeAccess<T> + ParCollection<Self> {
+    fn into_par_index(self) -> impl UnsafeIndex<T> + ParCollection<Self> {
         UnsafeCellSlice::new_owned(self)
     }
 
     #[inline(always)]
-    fn into_pointer_par_chunk_slice(
+    fn into_pointer_par_chunk_index(
         self,
         chunk_size: usize,
-    ) -> impl PointerChunkAccess<T> + ParCollection<Self> {
+    ) -> impl PointerChunkIndex<T> + ParCollection<Self> {
         assert_chunk_size(self.len(), chunk_size);
         UnsafeCellChunkSlice::new_owned(self, chunk_size)
     }
 
     #[inline(always)]
-    fn into_data_race_par_chunk_slice(
+    fn into_par_chunk_index_no_ref(
         self,
         chunk_size: usize,
-    ) -> impl UnsafeDataRaceChunkAccess<T> + ParCollection<Self> {
+    ) -> impl UnsafeNoRefChunkIndex<T> + ParCollection<Self> {
         assert_chunk_size(self.len(), chunk_size);
         UnsafeCellChunkSlice::new_owned(self, chunk_size)
     }
 
     #[inline(always)]
-    fn into_unsafe_par_chunk_slice(
+    fn into_par_chunk_index(
         self,
         chunk_size: usize,
-    ) -> impl UnsafeChunkAccess<T> + ParCollection<Self> {
+    ) -> impl UnsafeChunkIndex<T> + ParCollection<Self> {
         assert_chunk_size(self.len(), chunk_size);
         UnsafeCellChunkSlice::new_owned(self, chunk_size)
     }
 }
 
-unsafe impl<T: Send + Sync> IntoParSlice<T> for Vec<T> {
+unsafe impl<T: Send + Sync> IntoParIndex<T> for Vec<T> {
     #[inline(always)]
-    fn into_pointer_par_slice(self) -> impl PointerAccess<T> + ParCollection<Self> {
+    fn into_pointer_par_index(self) -> impl PointerIndex<T> + ParCollection<Self> {
         UnsafeCellSlice::new_owned(self.into_boxed_slice())
     }
 
     #[inline(always)]
-    fn into_data_race_par_slice(self) -> impl UnsafeDataRaceAccess<T> + ParCollection<Self> {
+    fn into_par_index_no_ref(self) -> impl UnsafeNoRefIndex<T> + ParCollection<Self> {
         UnsafeCellSlice::new_owned(self.into_boxed_slice())
     }
 
     #[inline(always)]
-    fn into_unsafe_par_slice(self) -> impl UnsafeAccess<T> + ParCollection<Self> {
+    fn into_par_index(self) -> impl UnsafeIndex<T> + ParCollection<Self> {
         UnsafeCellSlice::new_owned(self.into_boxed_slice())
     }
 
     #[inline(always)]
-    fn into_pointer_par_chunk_slice(
+    fn into_pointer_par_chunk_index(
         self,
         chunk_size: usize,
-    ) -> impl PointerChunkAccess<T> + ParCollection<Self> {
+    ) -> impl PointerChunkIndex<T> + ParCollection<Self> {
         assert_chunk_size(self.len(), chunk_size);
         UnsafeCellChunkSlice::new_owned(self.into_boxed_slice(), chunk_size)
     }
 
     #[inline(always)]
-    fn into_data_race_par_chunk_slice(
+    fn into_par_chunk_index_no_ref(
         self,
         chunk_size: usize,
-    ) -> impl UnsafeDataRaceChunkAccess<T> + ParCollection<Self> {
+    ) -> impl UnsafeNoRefChunkIndex<T> + ParCollection<Self> {
         assert_chunk_size(self.len(), chunk_size);
         UnsafeCellChunkSlice::new_owned(self.into_boxed_slice(), chunk_size)
     }
 
     #[inline(always)]
-    fn into_unsafe_par_chunk_slice(
+    fn into_par_chunk_index(
         self,
         chunk_size: usize,
-    ) -> impl UnsafeChunkAccess<T> + ParCollection<Self> {
+    ) -> impl UnsafeChunkIndex<T> + ParCollection<Self> {
         assert_chunk_size(self.len(), chunk_size);
         UnsafeCellChunkSlice::new_owned(self.into_boxed_slice(), chunk_size)
     }

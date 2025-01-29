@@ -74,7 +74,7 @@ pub fn main() {
 
         // Let's compute distances from node 0
         {
-            let dists = dists.as_data_race_par_slice();
+            let dists = dists.as_par_index_no_ref();
 
             while !current_frontier.is_empty() {
                 cursor.store(0, Ordering::Relaxed);

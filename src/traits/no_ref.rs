@@ -1,6 +1,7 @@
 use crate::*;
 
-/// Unsynchronized access to elements of a collection through setters and getters.
+/// Unsynchronized access to elements of a collection through setters and getters without
+/// crating references to its elements.
 ///
 /// The trait allows *unsynchronized* access to the elements of a collection by
 /// allowing the use of setters and getters from a *shared reference* to the
@@ -37,7 +38,7 @@ use crate::*;
 ///
 /// ```
 /// # use par_slice::*;
-/// let collection = vec![0; 5].into_data_race_par_slice();
+/// let collection = vec![0; 5].into_par_index_no_ref();
 ///
 /// unsafe {
 ///     // This is single threaded so no data races can happen
@@ -55,7 +56,7 @@ use crate::*;
 ///
 /// ```
 /// # use par_slice::*;
-/// let collection = vec![0; 5].into_data_race_par_slice();
+/// let collection = vec![0; 5].into_par_index_no_ref();
 ///
 /// unsafe {
 ///     // This is single threaded so no data races can happen and 0 and 1 are valid indexes
@@ -74,7 +75,7 @@ use crate::*;
 /// ```
 /// # use par_slice::*;
 /// # use std::thread::scope;
-/// let collection = vec![0; 5].into_data_race_par_slice();
+/// let collection = vec![0; 5].into_par_index_no_ref();
 ///
 /// scope(|s|{
 ///     s.spawn(||{
@@ -105,7 +106,7 @@ use crate::*;
 /// ```no_run
 /// # use par_slice::*;
 /// # use std::thread::scope;
-/// let collection = vec![0; 5].into_data_race_par_slice();
+/// let collection = vec![0; 5].into_par_index_no_ref();
 ///
 /// scope(|s|{
 ///     s.spawn(||{
@@ -129,7 +130,7 @@ use crate::*;
 /// ```
 ///
 /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
-pub unsafe trait UnsafeDataRaceAccess<T: ?Sized>: TrustedSizedCollection {
+pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
     /// Returns a bitwise copy of the element identified by `index` in the collection.
     ///
     /// This method performs bounds checking on `index` to ensure its validity.
@@ -149,7 +150,7 @@ pub unsafe trait UnsafeDataRaceAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 5].into_data_race_par_slice();
+    /// let collection = vec![0; 5].into_par_index_no_ref();
     /// // This is single threaded so no data races can happen
     /// assert_eq!(unsafe { collection.get(0) }, 0);
     /// ```
@@ -180,7 +181,7 @@ pub unsafe trait UnsafeDataRaceAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 5].into_data_race_par_slice();
+    /// let collection = vec![0; 5].into_par_index_no_ref();
     /// // We know 0 is a valid index for a collection of length 5
     /// // and this is single threaded so no data races can happen
     /// assert_eq!(unsafe { collection.get_unchecked(0) }, 0);
@@ -208,7 +209,7 @@ pub unsafe trait UnsafeDataRaceAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 5].into_data_race_par_slice();
+    /// let collection = vec![0; 5].into_par_index_no_ref();
     /// // This is single threaded so no data races can happen
     /// unsafe { collection.set(0, 42) };
     /// assert_eq!(unsafe { collection.get(0) }, 42);
@@ -240,7 +241,7 @@ pub unsafe trait UnsafeDataRaceAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 5].into_data_race_par_slice();
+    /// let collection = vec![0; 5].into_par_index_no_ref();
     /// // We know 0 is a valid index for a collection of length 5
     /// // and this is single threaded so no data races can happen
     /// unsafe { collection.set_unchecked(0, 42) };
@@ -251,7 +252,8 @@ pub unsafe trait UnsafeDataRaceAccess<T: ?Sized>: TrustedSizedCollection {
         T: Sized;
 }
 
-/// Unsynchronized access to chunks of elements of a collection through setters and getters.
+/// Unsynchronized access to chunks of elements of a collection through setters and getters without
+/// crating references to its elements.
 ///
 /// The trait allows *unsynchronized* access to chunks of elements elements of a collection by
 /// allowing the use of setters and getters from a *shared reference* to the
@@ -292,7 +294,7 @@ pub unsafe trait UnsafeDataRaceAccess<T: ?Sized>: TrustedSizedCollection {
 ///
 /// ```
 /// # use par_slice::*;
-/// let collection = vec![0; 6].into_data_race_par_chunk_slice(2);
+/// let collection = vec![0; 6].into_par_chunk_index_no_ref(2);
 ///
 /// unsafe {
 ///     // This is single threaded so no data races can happen
@@ -310,7 +312,7 @@ pub unsafe trait UnsafeDataRaceAccess<T: ?Sized>: TrustedSizedCollection {
 ///
 /// ```
 /// # use par_slice::*;
-/// let collection = vec![0; 6].into_data_race_par_chunk_slice(2);
+/// let collection = vec![0; 6].into_par_chunk_index_no_ref(2);
 ///
 /// unsafe {
 ///     // This is single threaded so no data races can happen and 0 and 1 are valid indexes
@@ -329,7 +331,7 @@ pub unsafe trait UnsafeDataRaceAccess<T: ?Sized>: TrustedSizedCollection {
 /// ```
 /// # use par_slice::*;
 /// # use std::thread::scope;
-/// let collection = vec![0; 10].into_data_race_par_chunk_slice(2);
+/// let collection = vec![0; 10].into_par_chunk_index_no_ref(2);
 ///
 /// scope(|s|{
 ///     s.spawn(||{
@@ -360,7 +362,7 @@ pub unsafe trait UnsafeDataRaceAccess<T: ?Sized>: TrustedSizedCollection {
 /// ```no_run
 /// # use par_slice::*;
 /// # use std::thread::scope;
-/// let collection = vec![0; 10].into_data_race_par_chunk_slice(2);
+/// let collection = vec![0; 10].into_par_chunk_index_no_ref(2);
 ///
 /// scope(|s|{
 ///     s.spawn(||{
@@ -384,7 +386,7 @@ pub unsafe trait UnsafeDataRaceAccess<T: ?Sized>: TrustedSizedCollection {
 /// ```
 ///
 /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
-pub unsafe trait UnsafeDataRaceChunkAccess<T>: TrustedChunkSizedCollection {
+pub unsafe trait UnsafeNoRefChunkIndex<T>: TrustedChunkSizedCollection {
     /// Returns a [`Box`] containing a bitwise copy of the chunk of elements identified by `index` in
     /// the collection.
     ///
@@ -405,7 +407,7 @@ pub unsafe trait UnsafeDataRaceChunkAccess<T>: TrustedChunkSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 10].into_data_race_par_chunk_slice(2);
+    /// let collection = vec![0; 10].into_par_chunk_index_no_ref(2);
     /// // This is single threaded so no data races can happen
     /// assert_eq!(unsafe { collection.get(0).as_ref() }, [0, 0]);
     /// ```
@@ -437,7 +439,7 @@ pub unsafe trait UnsafeDataRaceChunkAccess<T>: TrustedChunkSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 10].into_data_race_par_chunk_slice(2);
+    /// let collection = vec![0; 10].into_par_chunk_index_no_ref(2);
     /// // We know 0 is a valid index for a collection of length 5
     /// // and this is single threaded so no data races can happen
     /// assert_eq!(unsafe { collection.get_unchecked(0).as_ref() }, [0, 0]);
@@ -465,7 +467,7 @@ pub unsafe trait UnsafeDataRaceChunkAccess<T>: TrustedChunkSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 10].into_data_race_par_chunk_slice(2);
+    /// let collection = vec![0; 10].into_par_chunk_index_no_ref(2);
     /// // This is single threaded so no data races can happen
     /// unsafe { collection.set(0, &[42, 69]) };
     /// assert_eq!(unsafe { collection.get(0).as_ref() }, [42, 69]);
@@ -501,7 +503,7 @@ pub unsafe trait UnsafeDataRaceChunkAccess<T>: TrustedChunkSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 10].into_data_race_par_chunk_slice(2);
+    /// let collection = vec![0; 10].into_par_chunk_index_no_ref(2);
     /// // We know 0 is a valid index for a collection of length 5
     /// // and this is single threaded so no data races can happen
     /// unsafe { collection.set_unchecked(0, &[42, 69]) };

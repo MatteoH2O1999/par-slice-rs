@@ -17,7 +17,7 @@ pub unsafe trait TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 5].into_unsafe_par_slice();
+    /// let collection = vec![0; 5].into_par_index();
     /// assert_eq!(collection.len(), 5);
     /// ```
     fn len(&self) -> usize;
@@ -30,12 +30,12 @@ pub unsafe trait TrustedSizedCollection {
     /// # use par_slice::*;
     /// let mut v = Vec::new();
     /// {
-    ///     let collection = v.as_unsafe_par_slice();
+    ///     let collection = v.as_par_index();
     ///     assert!(collection.is_empty());
     /// }
     /// v.push(42);
     /// {
-    ///     let collection = v.as_unsafe_par_slice();
+    ///     let collection = v.as_par_index();
     ///     assert!(!collection.is_empty());
     /// }
     /// ```
@@ -66,7 +66,7 @@ pub unsafe trait TrustedChunkSizedCollection: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 20].into_unsafe_par_chunk_slice(5);
+    /// let collection = vec![0; 20].into_par_chunk_index(5);
     /// assert_eq!(collection.chunk_size(), 5);
     /// ```
     fn chunk_size(&self) -> usize;
@@ -77,7 +77,7 @@ pub unsafe trait TrustedChunkSizedCollection: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 20].into_unsafe_par_chunk_slice(5);
+    /// let collection = vec![0; 20].into_par_chunk_index(5);
     /// assert_eq!(collection.num_elements(), 20);
     /// ```
     #[inline(always)]
@@ -93,7 +93,7 @@ pub unsafe trait TrustedChunkSizedCollection: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 20].into_unsafe_par_chunk_slice(5);
+    /// let collection = vec![0; 20].into_par_chunk_index(5);
     /// assert_eq!(collection.num_chunks(), 4);
     /// assert_eq!(collection.len(), 4);
     /// ```

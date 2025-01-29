@@ -3,10 +3,10 @@ name = "par_slice"
 version = "0.2.1"
 edition = "2021"
 authors = ["Matteo Dell'Acqua <dellacqua.matteo99@gmail.com>"]
-description = "Slices that may be accessed from multiple threads with different evels of safety"
+description = "Slices that may be accessed from multiple threads with different levels of safety"
 repository = "https://github.com/MatteoH2O1999/par-slice-rs"
 license = "MIT"
-keywords = ["slice", "par", "parallel", "access", "concurrent"]
+keywords = ["slice", "index", "parallel", "access", "concurrent"]
 categories = ["concurrency"]
 rust-version = "1.84"
 

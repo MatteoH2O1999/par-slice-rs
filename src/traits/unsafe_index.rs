@@ -43,7 +43,7 @@ use crate::*;
 ///
 /// ```
 /// # use par_slice::*;
-/// let collection = vec![0; 5].into_unsafe_par_slice();
+/// let collection = vec![0; 5].into_par_index();
 ///
 /// unsafe {
 ///     // This checks 0 is a valid index
@@ -59,7 +59,7 @@ use crate::*;
 ///
 /// ```no_run
 /// # use par_slice::*;
-/// let collection = vec![0; 5].into_unsafe_par_slice();
+/// let collection = vec![0; 5].into_par_index();
 ///
 /// unsafe {
 ///     let mut_ref_0 = collection.get_mut(0);
@@ -72,7 +72,7 @@ use crate::*;
 ///
 /// ```
 /// # use par_slice::*;
-/// let collection = vec![0; 5].into_unsafe_par_slice();
+/// let collection = vec![0; 5].into_par_index();
 ///
 /// unsafe {
 ///     let ref_0 = collection.get(0);
@@ -88,7 +88,7 @@ use crate::*;
 ///
 /// ```no_run
 /// # use par_slice::*;
-/// let collection = vec![0; 5].into_unsafe_par_slice();
+/// let collection = vec![0; 5].into_par_index();
 ///
 /// unsafe {
 ///     let ref_0 = collection.get(0);
@@ -109,7 +109,7 @@ use crate::*;
 ///
 /// ```
 /// # use par_slice::*;
-/// let collection = vec![0; 5].into_unsafe_par_slice();
+/// let collection = vec![0; 5].into_par_index();
 ///
 /// unsafe {
 ///     let ref_0 = collection.get(0);
@@ -131,7 +131,7 @@ use crate::*;
 /// ```
 ///
 /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
-pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
+pub unsafe trait UnsafeIndex<T: ?Sized>: TrustedSizedCollection {
     /// Returns a shared reference to the element identified by `index` in the collection.
     ///
     /// This method performs bounds checking on `index` to ensure its validity.
@@ -150,7 +150,7 @@ pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 5].into_unsafe_par_slice();
+    /// let collection = vec![0; 5].into_par_index();
     /// let ref_0: &usize = unsafe { collection.get(0) };
     /// assert_eq!(*ref_0, 0);
     /// ```
@@ -177,7 +177,7 @@ pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 5].into_unsafe_par_slice();
+    /// let collection = vec![0; 5].into_par_index();
     /// // We know 0 is a valid index for a collection of length 5
     /// let ref_0: &usize = unsafe { collection.get_unchecked(0) };
     /// assert_eq!(*ref_0, 0);
@@ -202,7 +202,7 @@ pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 5].into_unsafe_par_slice();
+    /// let collection = vec![0; 5].into_par_index();
     /// {
     ///     let ref_0: &mut usize = unsafe { collection.get_mut(0) };
     ///     *ref_0 = 42;
@@ -235,7 +235,7 @@ pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 5].into_unsafe_par_slice();
+    /// let collection = vec![0; 5].into_par_index();
     /// {
     ///     // We know 0 is a valid index for a collection of length 5
     ///     let ref_0: &mut usize = unsafe { collection.get_mut_unchecked(0) };
@@ -265,9 +265,9 @@ pub unsafe trait UnsafeAccess<T: ?Sized>: TrustedSizedCollection {
 /// * For each collection of size `n`, chunk indexes are defined from `0` to `n - 1`, each univocally identifying a chunk of elements in
 ///   the collection as follows: a chunk of index `i` includes all elements from index `i * collection.chunk_size()` included to
 ///   `(i + 1) * collection.chunk_size()` excluded.
-/// * The collection implements [`UnsafeAccess<[T]>`](`UnsafeAccess`) where `[T]` is a chunk, so `[T].len() == collection.chunk_size()`,
+/// * The collection implements [`UnsafeIndex<[T]>`](`UnsafeIndex`) where `[T]` is a chunk, so `[T].len() == collection.chunk_size()`,
 ///   and where all the methods' indexes refer to the chunk indexes as defined above.
-pub unsafe trait UnsafeChunkAccess<T>:
-    UnsafeAccess<[T]> + TrustedChunkSizedCollection
+pub unsafe trait UnsafeChunkIndex<T>:
+    UnsafeIndex<[T]> + TrustedChunkSizedCollection
 {
 }

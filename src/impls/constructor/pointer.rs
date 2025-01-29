@@ -2,14 +2,14 @@ use crate::*;
 use std::fmt::Debug;
 
 /// Utility struct for contructors for slices that allow unsynchronized access
-/// to their elements through [`PointerAccess`] and [`PointerChunkAccess`].
+/// to their elements through [`PointerIndex`] and [`PointerChunkIndex`].
 pub struct PointerParSlice;
 
 impl PointerParSlice {
     #[allow(clippy::new_ret_no_self)]
     /// Constructs a new slice with `len` elements, each initialized
     /// to [`T::default`](`Default::default`), that allows unsynchronized
-    /// access to its elements through [`PointerAccess`] and that can be
+    /// access to its elements through [`PointerIndex`] and that can be
     /// converted into a boxed slice.
     ///
     /// # Examples
@@ -26,13 +26,13 @@ impl PointerParSlice {
     #[inline(always)]
     pub fn new<T: Default + Send + Sync>(
         len: usize,
-    ) -> impl PointerAccess<T> + Into<Box<[T]>> + Sync + Debug {
-        new_boxed_slice(len).into_pointer_par_slice()
+    ) -> impl PointerIndex<T> + Into<Box<[T]>> + Sync + Debug {
+        new_boxed_slice(len).into_pointer_par_index()
     }
 
     /// Constructs a new slice with `len` elements, each initialized
     /// to `value`, that allows unsynchronized
-    /// access to its elements through [`PointerAccess`] and that can be
+    /// access to its elements through [`PointerIndex`] and that can be
     /// converted into a boxed slice.
     ///
     /// # Examples
@@ -50,14 +50,14 @@ impl PointerParSlice {
     pub fn with_value<T: Clone + Send + Sync>(
         value: T,
         len: usize,
-    ) -> impl PointerAccess<T> + Into<Box<[T]>> + Sync + Debug {
-        new_boxed_slice_with_value(len, value).into_pointer_par_slice()
+    ) -> impl PointerIndex<T> + Into<Box<[T]>> + Sync + Debug {
+        new_boxed_slice_with_value(len, value).into_pointer_par_index()
     }
 
     /// Constructs a new slice with `len` elements, each initialized
     /// to the return value of `closure` called with the index of the element
     /// to generate as an [`usize`], that allows unsynchronized
-    /// access to its elements through [`PointerAccess`] and that can be
+    /// access to its elements through [`PointerIndex`] and that can be
     /// converted into a boxed slice.
     ///
     /// # Examples
@@ -75,14 +75,14 @@ impl PointerParSlice {
     pub fn with_closure<T: Send + Sync>(
         closure: impl FnMut(usize) -> T,
         len: usize,
-    ) -> impl PointerAccess<T> + Into<Box<[T]>> + Sync + Debug {
-        new_boxed_slice_with(len, closure).into_pointer_par_slice()
+    ) -> impl PointerIndex<T> + Into<Box<[T]>> + Sync + Debug {
+        new_boxed_slice_with(len, closure).into_pointer_par_index()
     }
 
     /// Constructs a new slice with `len` elements, each initialized
     /// to [`T::default`](`Default::default`), that allows unsynchronized
     /// access to chunks of `chunk_size` of its elements through
-    /// [`PointerChunkAccess`] and that can be converted into a boxed slice.
+    /// [`PointerChunkIndex`] and that can be converted into a boxed slice.
     ///
     /// # Examples
     /// ```
@@ -99,15 +99,15 @@ impl PointerParSlice {
     pub fn new_chunks<T: Default + Send + Sync>(
         len: usize,
         chunk_size: usize,
-    ) -> impl PointerChunkAccess<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl PointerChunkIndex<T> + Into<Box<[T]>> + Sync + Debug {
         assert_chunk_size(len, chunk_size);
-        new_boxed_slice(len).into_pointer_par_chunk_slice(chunk_size)
+        new_boxed_slice(len).into_pointer_par_chunk_index(chunk_size)
     }
 
     /// Constructs a new slice with `len` elements, each initialized
     /// to `value`, that allows unsynchronized
     /// access to chunks of `chunk_size` of its elements through
-    /// [`PointerChunkAccess`] and that can be converted into a boxed slice.
+    /// [`PointerChunkIndex`] and that can be converted into a boxed slice.
     ///
     /// # Examples
     /// ```
@@ -125,16 +125,16 @@ impl PointerParSlice {
         value: T,
         len: usize,
         chunk_size: usize,
-    ) -> impl PointerChunkAccess<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl PointerChunkIndex<T> + Into<Box<[T]>> + Sync + Debug {
         assert_chunk_size(len, chunk_size);
-        new_boxed_slice_with_value(len, value).into_pointer_par_chunk_slice(chunk_size)
+        new_boxed_slice_with_value(len, value).into_pointer_par_chunk_index(chunk_size)
     }
 
     /// Constructs a new slice with `len` elements, each initialized
     /// to the return value of `closure` called with the index of the element
     /// to generate as an [`usize`], that allows unsynchronized
     /// access to chunks of `chunk_size` of its elements through
-    /// [`PointerChunkAccess`] and that can be converted into a boxed slice.
+    /// [`PointerChunkIndex`] and that can be converted into a boxed slice.
     ///
     /// # Examples
     /// ```
@@ -152,8 +152,8 @@ impl PointerParSlice {
         closure: impl FnMut(usize) -> T,
         len: usize,
         chunk_size: usize,
-    ) -> impl PointerChunkAccess<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl PointerChunkIndex<T> + Into<Box<[T]>> + Sync + Debug {
         assert_chunk_size(len, chunk_size);
-        new_boxed_slice_with(len, closure).into_pointer_par_chunk_slice(chunk_size)
+        new_boxed_slice_with(len, closure).into_pointer_par_chunk_index(chunk_size)
     }
 }

@@ -46,7 +46,7 @@ use crate::*;
 ///
 /// ```
 /// # use par_slice::*;
-/// let collection = vec![0; 5].into_pointer_par_slice();
+/// let collection = vec![0; 5].into_pointer_par_index();
 /// let mut_ptr_0 = collection.get_mut_ptr(0);
 /// let mut_ptr_1 = unsafe {
 ///     // We know 1 is a valid index
@@ -63,7 +63,7 @@ use crate::*;
 ///
 /// ```
 /// # use par_slice::*;
-/// let collection = vec![0; 5].into_pointer_par_slice();
+/// let collection = vec![0; 5].into_pointer_par_index();
 /// let ptr = collection.get_mut_ptr(0);
 /// unsafe {
 ///     // There are no data races and no references to element 0
@@ -77,7 +77,7 @@ use crate::*;
 ///
 /// ```
 /// # use par_slice::*;
-/// let collection = vec![0; 5].into_pointer_par_slice();
+/// let collection = vec![0; 5].into_pointer_par_index();
 /// let ptr = collection.get_mut_ptr(0);
 /// {
 ///     let reference = unsafe {
@@ -93,7 +93,7 @@ use crate::*;
 ///
 /// ```no_run
 /// # use par_slice::*;
-/// let collection = vec![0; 5].into_pointer_par_slice();
+/// let collection = vec![0; 5].into_pointer_par_index();
 /// let ptr = collection.get_mut_ptr(0);
 /// {
 ///     let reference = unsafe {
@@ -109,7 +109,7 @@ use crate::*;
 /// ```
 ///
 /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
-pub unsafe trait PointerAccess<T: ?Sized>: TrustedSizedCollection {
+pub unsafe trait PointerIndex<T: ?Sized>: TrustedSizedCollection {
     /// Returns an immutable pointer to the element identified by `index` in the collection, without performing
     /// bounds checking.
     ///
@@ -124,7 +124,7 @@ pub unsafe trait PointerAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 5].into_pointer_par_slice();
+    /// let collection = vec![0; 5].into_pointer_par_index();
     /// // We know 0 is a valid index for a collection of length 5
     /// let ptr_0: *const usize = unsafe { collection.get_ptr_unchecked(0) };
     /// assert_eq!(unsafe {*ptr_0}, 0);
@@ -145,7 +145,7 @@ pub unsafe trait PointerAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 5].into_pointer_par_slice();
+    /// let collection = vec![0; 5].into_pointer_par_index();
     /// // We know 0 is a valid index for a collection of length 5
     /// let ptr_0: *mut usize = unsafe { collection.get_mut_ptr_unchecked(0) };
     /// // No other reference exists so we may dereference ptr_0 safely
@@ -168,7 +168,7 @@ pub unsafe trait PointerAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 5].into_pointer_par_slice();
+    /// let collection = vec![0; 5].into_pointer_par_index();
     /// let ptr_0: *const usize =  collection.get_ptr(0);
     /// // No other reference exists so we may dereference ptr_0 safely
     /// assert_eq!(unsafe { *ptr_0 }, 0);
@@ -196,7 +196,7 @@ pub unsafe trait PointerAccess<T: ?Sized>: TrustedSizedCollection {
     ///
     /// ```
     /// # use par_slice::*;
-    /// let collection = vec![0; 5].into_pointer_par_slice();
+    /// let collection = vec![0; 5].into_pointer_par_index();
     /// let ptr_0: *mut usize = collection.get_mut_ptr(0);
     /// // No other reference exists so we may dereference ptr_0 safely
     /// unsafe { *ptr_0 = 42 };
@@ -229,9 +229,9 @@ pub unsafe trait PointerAccess<T: ?Sized>: TrustedSizedCollection {
 /// * For each collection of size `n`, chunk indexes are defined from `0` to `n - 1`, each univocally identifying a chunk of elements in
 ///   the collection as follows: a chunk of index `i` includes all elements from index `i * collection.chunk_size()` included to
 ///   `(i + 1) * collection.chunk_size()` excluded.
-/// * The collection implements [`UnsafeAccess<[T]>`](`UnsafeAccess`) where `[T]` is a chunk, so `[T].len() == collection.chunk_size()`,
+/// * The collection implements [`PointerIndex<[T]>`](`PointerIndex`) where `[T]` is a chunk, so `[T].len() == collection.chunk_size()`,
 ///   and where all the methods' indexes refer to the chunk indexes as defined above.
-pub unsafe trait PointerChunkAccess<T>:
-    PointerAccess<[T]> + TrustedChunkSizedCollection
+pub unsafe trait PointerChunkIndex<T>:
+    PointerIndex<[T]> + TrustedChunkSizedCollection
 {
 }

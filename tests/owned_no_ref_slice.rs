@@ -7,7 +7,7 @@ use std::thread::scope;
 
 #[test]
 fn no_thread_unchecked() {
-    let slice = vec![1, 2, 3].into_data_race_par_slice();
+    let slice = vec![1, 2, 3].into_par_index_no_ref();
 
     assert_eq!(unsafe { slice.get_unchecked(1) }, 2);
     unsafe {
@@ -19,7 +19,7 @@ fn no_thread_unchecked() {
 
 #[test]
 fn no_thread_checked() {
-    let slice = vec![1, 2, 3].into_data_race_par_slice();
+    let slice = vec![1, 2, 3].into_par_index_no_ref();
 
     assert_eq!(unsafe { slice.get(1) }, 2);
     unsafe {
@@ -32,7 +32,7 @@ fn no_thread_checked() {
 #[test]
 #[should_panic(expected = "Index 42 invalid for slice of len 3")]
 fn no_thread_checked_panic_get() {
-    let slice = vec![1, 2, 3].into_data_race_par_slice();
+    let slice = vec![1, 2, 3].into_par_index_no_ref();
 
     unsafe {
         slice.get(42);
@@ -42,7 +42,7 @@ fn no_thread_checked_panic_get() {
 #[test]
 #[should_panic(expected = "Index 69 invalid for slice of len 3")]
 fn no_thread_checked_panic_set() {
-    let slice = vec![1, 2, 3].into_data_race_par_slice();
+    let slice = vec![1, 2, 3].into_par_index_no_ref();
 
     unsafe {
         slice.set(69, 42);
@@ -55,7 +55,7 @@ fn no_thread_checked_panic_set() {
 
 #[test]
 fn single_thread_unchecked() {
-    let slice = vec![1, 2, 3].into_data_race_par_slice();
+    let slice = vec![1, 2, 3].into_par_index_no_ref();
 
     scope(|s| {
         s.spawn(|| {
@@ -75,7 +75,7 @@ fn single_thread_unchecked() {
 
 #[test]
 fn single_thread_checked() {
-    let slice = vec![1, 2, 3].into_data_race_par_slice();
+    let slice = vec![1, 2, 3].into_par_index_no_ref();
 
     scope(|s| {
         s.spawn(|| {
@@ -95,7 +95,7 @@ fn single_thread_checked() {
 
 #[test]
 fn single_thread_checked_panic_get() {
-    let slice = vec![1, 2, 3].into_data_race_par_slice();
+    let slice = vec![1, 2, 3].into_par_index_no_ref();
 
     scope(|s| {
         s.spawn(|| {
@@ -115,7 +115,7 @@ fn single_thread_checked_panic_get() {
 
 #[test]
 fn single_thread_checked_panic_set() {
-    let slice = vec![1, 2, 3].into_data_race_par_slice();
+    let slice = vec![1, 2, 3].into_par_index_no_ref();
 
     scope(|s| {
         s.spawn(|| {
@@ -139,7 +139,7 @@ fn single_thread_checked_panic_set() {
 
 #[test]
 fn multithread_unchecked() {
-    let slice = vec![1, 2, 3].into_data_race_par_slice();
+    let slice = vec![1, 2, 3].into_par_index_no_ref();
 
     scope(|s| {
         s.spawn(|| {
@@ -155,7 +155,7 @@ fn multithread_unchecked() {
 
 #[test]
 fn multithread_checked() {
-    let slice = vec![1, 2, 3].into_data_race_par_slice();
+    let slice = vec![1, 2, 3].into_par_index_no_ref();
 
     scope(|s| {
         s.spawn(|| {
@@ -171,7 +171,7 @@ fn multithread_checked() {
 
 #[test]
 fn multithread_checked_panic_get() {
-    let slice = vec![1, 2, 3].into_data_race_par_slice();
+    let slice = vec![1, 2, 3].into_par_index_no_ref();
 
     scope(|s| {
         s.spawn(|| {
@@ -189,7 +189,7 @@ fn multithread_checked_panic_get() {
 
 #[test]
 fn multithread_checked_panic_mut() {
-    let slice = vec![1, 2, 3].into_data_race_par_slice();
+    let slice = vec![1, 2, 3].into_par_index_no_ref();
 
     scope(|s| {
         s.spawn(|| {

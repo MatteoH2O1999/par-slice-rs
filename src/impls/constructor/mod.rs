@@ -1,11 +1,11 @@
-mod data_race;
-pub use data_race::*;
+mod no_ref;
+pub use no_ref::*;
 
 mod pointer;
 pub use pointer::*;
 
-mod unsafe_access;
-pub use unsafe_access::*;
+mod unsafe_index;
+pub use unsafe_index::*;
 
 /// Creates a new boxed slice of `len` elements, each initialized to the return value
 /// of `closure`.

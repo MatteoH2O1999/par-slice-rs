@@ -111,7 +111,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedChunkSizedCollection
     }
 }
 
-unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerAccess<[T]> for UnsafeCellChunkSlice<B> {
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerIndex<[T]> for UnsafeCellChunkSlice<B> {
     #[inline(always)]
     unsafe fn get_ptr_unchecked(&self, index: usize) -> *const [T] {
         self.get_mut_ptr_unchecked(index) as *const [T]
@@ -134,12 +134,12 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerAccess<[T]> for Unsafe
     }
 }
 
-unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerChunkAccess<T>
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerChunkIndex<T>
     for UnsafeCellChunkSlice<B>
 {
 }
 
-unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceChunkAccess<T>
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeNoRefChunkIndex<T>
     for UnsafeCellChunkSlice<B>
 {
     #[inline(always)]
@@ -193,7 +193,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceChunkAccess<T>
     }
 }
 
-unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeAccess<[T]> for UnsafeCellChunkSlice<B> {
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeIndex<[T]> for UnsafeCellChunkSlice<B> {
     #[inline(always)]
     unsafe fn get_unchecked(&self, index: usize) -> &[T] {
         unsafe {
@@ -213,7 +213,4 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeAccess<[T]> for UnsafeC
     }
 }
 
-unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeChunkAccess<T>
-    for UnsafeCellChunkSlice<B>
-{
-}
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeChunkIndex<T> for UnsafeCellChunkSlice<B> {}

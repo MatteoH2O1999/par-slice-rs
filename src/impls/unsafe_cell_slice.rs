@@ -62,7 +62,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedSizedCollection for Un
     }
 }
 
-unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerAccess<T> for UnsafeCellSlice<B> {
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerIndex<T> for UnsafeCellSlice<B> {
     #[inline(always)]
     unsafe fn get_ptr_unchecked(&self, index: usize) -> *const T {
         self.get_mut_ptr_unchecked(index) as *const T
@@ -81,7 +81,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerAccess<T> for UnsafeCe
     }
 }
 
-unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceAccess<T> for UnsafeCellSlice<B> {
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeNoRefIndex<T> for UnsafeCellSlice<B> {
     #[inline(always)]
     unsafe fn get_unchecked(&self, index: usize) -> T
     where
@@ -107,7 +107,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeDataRaceAccess<T> for U
     }
 }
 
-unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeAccess<T> for UnsafeCellSlice<B> {
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeIndex<T> for UnsafeCellSlice<B> {
     #[inline(always)]
     unsafe fn get_unchecked(&self, index: usize) -> &T {
         unsafe {

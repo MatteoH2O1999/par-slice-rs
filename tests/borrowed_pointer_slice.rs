@@ -10,7 +10,7 @@ fn no_thread_unchecked() {
     let mut v = vec![1, 2, 3];
 
     {
-        let slice = v.as_pointer_par_slice();
+        let slice = v.as_pointer_par_index();
         assert_eq!(unsafe { *slice.get_ptr_unchecked(1) }, 2);
         unsafe {
             *slice.get_mut_ptr_unchecked(2) = 42;
@@ -25,7 +25,7 @@ fn no_thread_checked() {
     let mut v = vec![1, 2, 3];
 
     {
-        let slice = v.as_pointer_par_slice();
+        let slice = v.as_pointer_par_index();
         assert_eq!(unsafe { *slice.get_ptr(1) }, 2);
         unsafe {
             *slice.get_mut_ptr(2) = 42;
@@ -41,7 +41,7 @@ fn no_thread_checked_panic() {
     let mut v = vec![1, 2, 3];
 
     {
-        let slice = v.as_pointer_par_slice();
+        let slice = v.as_pointer_par_index();
         slice.get_ptr(42);
     }
 }
@@ -52,7 +52,7 @@ fn no_thread_checked_panic_mut() {
     let mut v = vec![1, 2, 3];
 
     {
-        let slice = v.as_pointer_par_slice();
+        let slice = v.as_pointer_par_index();
         slice.get_mut_ptr(69);
     }
 }
@@ -66,7 +66,7 @@ fn single_thread_unchecked() {
     let mut v = vec![1, 2, 3];
 
     {
-        let slice = v.as_pointer_par_slice();
+        let slice = v.as_pointer_par_index();
         scope(|s| {
             s.spawn(|| {
                 assert_eq!(unsafe { *slice.get_ptr_unchecked(1) }, 2);
@@ -89,7 +89,7 @@ fn single_thread_checked() {
     let mut v = vec![1, 2, 3];
 
     {
-        let slice = v.as_pointer_par_slice();
+        let slice = v.as_pointer_par_index();
         scope(|s| {
             s.spawn(|| {
                 assert_eq!(unsafe { *slice.get_ptr(1) }, 2);
@@ -112,7 +112,7 @@ fn single_thread_checked_panic() {
     let mut v = vec![1, 2, 3];
 
     {
-        let slice = v.as_pointer_par_slice();
+        let slice = v.as_pointer_par_index();
         scope(|s| {
             s.spawn(|| {
                 slice.get_ptr(42);
@@ -135,7 +135,7 @@ fn single_thread_checked_panic_mut() {
     let mut v = vec![1, 2, 3];
 
     {
-        let slice = v.as_pointer_par_slice();
+        let slice = v.as_pointer_par_index();
         scope(|s| {
             s.spawn(|| {
                 assert_eq!(unsafe { *slice.get_ptr(1) }, 2);
@@ -162,7 +162,7 @@ fn multithread_unchecked() {
     let mut v = vec![1, 2, 3];
 
     {
-        let slice = v.as_pointer_par_slice();
+        let slice = v.as_pointer_par_index();
         scope(|s| {
             s.spawn(|| {
                 assert_eq!(unsafe { *slice.get_ptr_unchecked(1) }, 2);
@@ -181,7 +181,7 @@ fn multithread_checked() {
     let mut v = vec![1, 2, 3];
 
     {
-        let slice = v.as_pointer_par_slice();
+        let slice = v.as_pointer_par_index();
         scope(|s| {
             s.spawn(|| {
                 assert_eq!(unsafe { *slice.get_ptr(1) }, 2);
@@ -200,7 +200,7 @@ fn multithread_checked_panic() {
     let mut v = vec![1, 2, 3];
 
     {
-        let slice = v.as_pointer_par_slice();
+        let slice = v.as_pointer_par_index();
         scope(|s| {
             s.spawn(|| {
                 unsafe { *slice.get_mut_ptr(2) = 42 };
@@ -221,7 +221,7 @@ fn multithread_checked_panic_mut() {
     let mut v = vec![1, 2, 3];
 
     {
-        let slice = v.as_pointer_par_slice();
+        let slice = v.as_pointer_par_index();
         scope(|s| {
             s.spawn(|| {
                 assert_eq!(unsafe { *slice.get_ptr(1) }, 2);
