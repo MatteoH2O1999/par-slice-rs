@@ -26,7 +26,6 @@ impl<T> From<UnsafeCellSlice<Box<UnsafeCell<[T]>>>> for Vec<T> {
 
 impl<'a, T> UnsafeCellSlice<&'a mut UnsafeCell<[T]>> {
     /// Creates a new borrowed slice.
-    #[inline(always)]
     pub(crate) fn new_borrowed(slice: &'a mut [T]) -> Self {
         Self(UnsafeCell::from_mut(slice))
     }
@@ -34,7 +33,6 @@ impl<'a, T> UnsafeCellSlice<&'a mut UnsafeCell<[T]>> {
 
 impl<T> UnsafeCellSlice<Box<UnsafeCell<[T]>>> {
     /// Creates a new owned slice.
-    #[inline(always)]
     pub(crate) fn new_owned(slice: Box<[T]>) -> Self {
         let ptr = Box::into_raw(slice) as *mut UnsafeCell<[T]>;
         let boxed = unsafe {
@@ -45,7 +43,6 @@ impl<T> UnsafeCellSlice<Box<UnsafeCell<[T]>>> {
     }
 
     /// Extracts the inner boxed slice from the wrapper.
-    #[inline(always)]
     fn into_inner(self) -> Box<[T]> {
         let ptr = Box::into_raw(self.0) as *mut [T];
         unsafe {

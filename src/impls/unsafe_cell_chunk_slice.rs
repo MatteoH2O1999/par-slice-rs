@@ -35,7 +35,6 @@ impl<'a, T> UnsafeCellChunkSlice<&'a mut UnsafeCell<[T]>> {
     /// # Panics
     ///
     /// Panics if `slice.len()` is not divisible by `chunk_size`.
-    #[inline(always)]
     pub(crate) fn new_borrowed(slice: &'a mut [T], chunk_size: usize) -> Self {
         assert_eq!(slice.len() % chunk_size, 0);
         let len = slice.len() / chunk_size;
@@ -54,7 +53,6 @@ impl<T> UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {
     /// # Panics
     ///
     /// Panics if `slice.len()` is not divisible by `chunk_size`.
-    #[inline(always)]
     pub(crate) fn new_owned(slice: Box<[T]>, chunk_size: usize) -> Self {
         assert_eq!(slice.len() % chunk_size, 0);
         let len = slice.len() / chunk_size;
@@ -73,7 +71,6 @@ impl<T> UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {
     }
 
     /// Extracts the inner boxed slice from the wrapper.
-    #[inline(always)]
     fn into_inner(self) -> Box<[T]> {
         let ptr = Box::into_raw(self.inner) as *mut [T];
         unsafe {
