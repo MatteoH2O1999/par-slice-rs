@@ -1,5 +1,4 @@
 use crate::*;
-use std::fmt::Debug;
 
 /// Utility struct for contructors for slices that allow unsynchronized access
 /// to their elements through [`PointerIndex`] and [`PointerChunkIndex`].
@@ -26,7 +25,7 @@ impl PointerParSlice {
     #[inline(always)]
     pub fn new<T: Default + Send + Sync>(
         len: usize,
-    ) -> impl PointerIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl PointerIndex<T> + ParCollection<Box<[T]>> {
         new_boxed_slice(len).into_pointer_par_index()
     }
 
@@ -50,7 +49,7 @@ impl PointerParSlice {
     pub fn with_value<T: Clone + Send + Sync>(
         value: T,
         len: usize,
-    ) -> impl PointerIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl PointerIndex<T> + ParCollection<Box<[T]>> {
         new_boxed_slice_with_value(len, value).into_pointer_par_index()
     }
 
@@ -75,7 +74,7 @@ impl PointerParSlice {
     pub fn with_closure<T: Send + Sync>(
         closure: impl FnMut(usize) -> T,
         len: usize,
-    ) -> impl PointerIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl PointerIndex<T> + ParCollection<Box<[T]>> {
         new_boxed_slice_with(len, closure).into_pointer_par_index()
     }
 
@@ -99,7 +98,7 @@ impl PointerParSlice {
     pub fn new_chunks<T: Default + Send + Sync>(
         len: usize,
         chunk_size: usize,
-    ) -> impl PointerChunkIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl PointerChunkIndex<T> + ParCollection<Box<[T]>> {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice(len).into_pointer_par_chunk_index(chunk_size)
     }
@@ -125,7 +124,7 @@ impl PointerParSlice {
         value: T,
         len: usize,
         chunk_size: usize,
-    ) -> impl PointerChunkIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl PointerChunkIndex<T> + ParCollection<Box<[T]>> {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice_with_value(len, value).into_pointer_par_chunk_index(chunk_size)
     }
@@ -152,7 +151,7 @@ impl PointerParSlice {
         closure: impl FnMut(usize) -> T,
         len: usize,
         chunk_size: usize,
-    ) -> impl PointerChunkIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl PointerChunkIndex<T> + ParCollection<Box<[T]>> {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice_with(len, closure).into_pointer_par_chunk_index(chunk_size)
     }

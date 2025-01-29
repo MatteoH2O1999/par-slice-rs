@@ -1,5 +1,4 @@
 use crate::*;
-use std::fmt::Debug;
 
 /// Utility struct for contructors for slices that allow unsynchronized access
 /// to their elements through [`UnsafeNoRefIndex`] and [`UnsafeNoRefChunkIndex`].
@@ -26,7 +25,7 @@ impl NoRefParSlice {
     #[inline(always)]
     pub fn new<T: Default + Send + Sync>(
         len: usize,
-    ) -> impl UnsafeNoRefIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl UnsafeNoRefIndex<T> + ParCollection<Box<[T]>> {
         new_boxed_slice(len).into_par_index_no_ref()
     }
 
@@ -50,7 +49,7 @@ impl NoRefParSlice {
     pub fn with_value<T: Clone + Send + Sync>(
         value: T,
         len: usize,
-    ) -> impl UnsafeNoRefIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl UnsafeNoRefIndex<T> + ParCollection<Box<[T]>> {
         new_boxed_slice_with_value(len, value).into_par_index_no_ref()
     }
 
@@ -75,7 +74,7 @@ impl NoRefParSlice {
     pub fn with_closure<T: Send + Sync>(
         closure: impl FnMut(usize) -> T,
         len: usize,
-    ) -> impl UnsafeNoRefIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl UnsafeNoRefIndex<T> + ParCollection<Box<[T]>> {
         new_boxed_slice_with(len, closure).into_par_index_no_ref()
     }
 
@@ -99,7 +98,7 @@ impl NoRefParSlice {
     pub fn new_chunks<T: Default + Send + Sync>(
         len: usize,
         chunk_size: usize,
-    ) -> impl UnsafeNoRefChunkIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl UnsafeNoRefChunkIndex<T> + ParCollection<Box<[T]>> {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice(len).into_par_chunk_index_no_ref(chunk_size)
     }
@@ -125,7 +124,7 @@ impl NoRefParSlice {
         value: T,
         len: usize,
         chunk_size: usize,
-    ) -> impl UnsafeNoRefChunkIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl UnsafeNoRefChunkIndex<T> + ParCollection<Box<[T]>> {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice_with_value(len, value).into_par_chunk_index_no_ref(chunk_size)
     }
@@ -152,7 +151,7 @@ impl NoRefParSlice {
         closure: impl FnMut(usize) -> T,
         len: usize,
         chunk_size: usize,
-    ) -> impl UnsafeNoRefChunkIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl UnsafeNoRefChunkIndex<T> + ParCollection<Box<[T]>> {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice_with(len, closure).into_par_chunk_index_no_ref(chunk_size)
     }

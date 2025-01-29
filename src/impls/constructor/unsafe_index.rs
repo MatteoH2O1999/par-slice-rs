@@ -1,5 +1,4 @@
 use crate::*;
-use std::fmt::Debug;
 
 /// Utility struct for contructors for slices that allow unsynchronized access
 /// to their elements through [`UnsafeIndex`] and [`UnsafeChunkIndex`].
@@ -26,7 +25,7 @@ impl UnsafeParSlice {
     #[inline(always)]
     pub fn new<T: Default + Send + Sync>(
         len: usize,
-    ) -> impl UnsafeIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl UnsafeIndex<T> + ParCollection<Box<[T]>> {
         new_boxed_slice(len).into_par_index()
     }
 
@@ -50,7 +49,7 @@ impl UnsafeParSlice {
     pub fn with_value<T: Clone + Send + Sync>(
         value: T,
         len: usize,
-    ) -> impl UnsafeIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl UnsafeIndex<T> + ParCollection<Box<[T]>> {
         new_boxed_slice_with_value(len, value).into_par_index()
     }
 
@@ -75,7 +74,7 @@ impl UnsafeParSlice {
     pub fn with_closure<T: Send + Sync>(
         closure: impl FnMut(usize) -> T,
         len: usize,
-    ) -> impl UnsafeIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl UnsafeIndex<T> + ParCollection<Box<[T]>> {
         new_boxed_slice_with(len, closure).into_par_index()
     }
 
@@ -99,7 +98,7 @@ impl UnsafeParSlice {
     pub fn new_chunks<T: Default + Send + Sync>(
         len: usize,
         chunk_size: usize,
-    ) -> impl UnsafeChunkIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl UnsafeChunkIndex<T> + ParCollection<Box<[T]>> {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice(len).into_par_chunk_index(chunk_size)
     }
@@ -125,7 +124,7 @@ impl UnsafeParSlice {
         value: T,
         len: usize,
         chunk_size: usize,
-    ) -> impl UnsafeChunkIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl UnsafeChunkIndex<T> + ParCollection<Box<[T]>> {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice_with_value(len, value).into_par_chunk_index(chunk_size)
     }
@@ -152,7 +151,7 @@ impl UnsafeParSlice {
         closure: impl FnMut(usize) -> T,
         len: usize,
         chunk_size: usize,
-    ) -> impl UnsafeChunkIndex<T> + Into<Box<[T]>> + Sync + Debug {
+    ) -> impl UnsafeChunkIndex<T> + ParCollection<Box<[T]>> {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice_with(len, closure).into_par_chunk_index(chunk_size)
     }
