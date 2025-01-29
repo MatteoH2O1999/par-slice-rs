@@ -209,7 +209,7 @@ pub unsafe trait ParIndexView<T> {
     ///     unsafe {
     ///         view.set(0, &[0, 42, 2, 3, 4]);
     ///         view.set(1, &[69, 6, 7, 8, 9]);
-    ///         assert_eq!(view.get(1).as_ref(), [69, 6, 7, 8, 9]);
+    ///         assert_eq!(view.get(1, vec![0; 5]), vec![69, 6, 7, 8, 9]);
     ///     }
     /// }
     ///
@@ -445,7 +445,7 @@ pub unsafe trait IntoParIndex<T>: Sized {
     /// unsafe {
     ///     collection.set(0, &[0, 42, 2, 3, 4]);
     ///     collection.set(1, &[69, 6, 7, 8, 9]);
-    ///     assert_eq!(collection.get(1).as_ref(), [69, 6, 7, 8, 9]);
+    ///     assert_eq!(collection.get(1, vec![0; 5]).as_ref(), vec![69, 6, 7, 8, 9]);
     /// }
     ///
     /// assert_eq!(collection.into(), vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);

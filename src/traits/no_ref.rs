@@ -210,9 +210,11 @@ pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
     /// ```
     /// # use par_slice::*;
     /// let collection = vec![0; 5].into_par_index_no_ref();
+    ///
     /// // This is single threaded so no data races can happen
     /// unsafe { collection.set(0, 42) };
-    /// assert_eq!(unsafe { collection.get(0) }, 42);
+    ///
+    /// assert_eq!(collection.into(), vec![42, 0, 0, 0, 0]);
     /// ```
     unsafe fn set(&self, index: usize, value: T)
     where
@@ -242,10 +244,12 @@ pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
     /// ```
     /// # use par_slice::*;
     /// let collection = vec![0; 5].into_par_index_no_ref();
+    ///
     /// // We know 0 is a valid index for a collection of length 5
     /// // and this is single threaded so no data races can happen
     /// unsafe { collection.set_unchecked(0, 42) };
-    /// assert_eq!(unsafe { collection.get_unchecked(0) }, 42);
+    ///
+    /// assert_eq!(collection.into(), vec![42, 0, 0, 0, 0]);
     /// ```
     unsafe fn set_unchecked(&self, index: usize, value: T)
     where
@@ -275,16 +279,17 @@ pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
 /// * For each collection of size `n`, chunk indexes are defined from `0` to `n - 1`, each univocally identifying a chunk of elements in
 ///   the collection as follows: a chunk of index `i` includes all elements from index `i * collection.chunk_size()` included to
 ///   `(i + 1) * collection.chunk_size()` excluded.
-/// * For each index `i`, `collection.get(i)` returns a [`Box`] containing a bitwise copy of the chunk of elements identified
-///   by index `i` in the collection, panicking whenever `i` is out of bounds.
-///   It is still up to the caller to ensure no data races can happen during the read.
-/// * For each index `i`, `collection.get_unchecked(i)` returns a [`Box`] containing a bitwise copy of the chunk of elements
-///   identified by index `i` in the collection. It is up to the caller to ensure no data races can happen during the read.
+/// * For each index `i`, `collection.get(i, out)` sets `out` to a bitwise copy of the chunk of elements identified
+///   by index `i` in the collection, panicking whenever `i` is out of bounds or `out` has not the same size as
+///   [`chunk_size`](`TrustedChunkSizedCollection::chunk_size`). It is still up to the caller to ensure no data races can happen during the read.
+/// * For each index `i`, `collection.get_unchecked(i)` sets `out` to a bitwise copy of the chunk of elements
+///   identified by index `i` in the collection. It is up to the caller to ensure no data races can happen during the read and that `out`
+///   is a slice of the correct length.
 /// * For each index `i`, `collection.set(i, value)` sets the chunk of elements identified by index `i` in the collection to `value`,
 ///   panicking whenever `i` is out of bounds or `value` has not the same size as [`chunk_size`](`TrustedChunkSizedCollection::chunk_size`).
 ///   It is still up to the caller to ensure no data races can happen during the write.
 /// * For each index `i`, `collection.set_unchecked(i, value)` sets the chunk of elements identified by index `i` in the collection to `value`.
-///   It is up to the caller to ensure no data races can happen during the write and that `value`` is a chunk of the correct length.
+///   It is up to the caller to ensure no data races can happen during the write and that `value`` is a slice of the correct length.
 /// * For each valid index `i`, `collection.get(i) == collection.get_unchecked(i)`.
 /// * No references to elements in the collection are ever created.
 ///
@@ -300,7 +305,7 @@ pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
 ///     // This is single threaded so no data races can happen
 ///     collection.set(0, &[42, 69]);
 ///     collection.set(1, &[42, 69]);
-///     assert_eq!(collection.get(0).as_ref(), [42, 69]);
+///     assert_eq!(collection.get(0, vec![0; 2]), vec![42, 69]);
 ///     collection.set(0, &[69, 42]);
 /// }
 ///
@@ -319,7 +324,7 @@ pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
 ///     // for a collection of length 6 with chunks of size 2
 ///     collection.set_unchecked(0, &[42, 69]);
 ///     collection.set_unchecked(1, &[42, 69]);
-///     assert_eq!(collection.get_unchecked(0).as_ref(), [42, 69]);
+///     assert_eq!(collection.get_unchecked(0, vec![0; 2]), vec![42, 69]);
 ///     collection.set_unchecked(0, &[69, 42]);
 /// }
 ///
@@ -396,7 +401,7 @@ pub unsafe trait UnsafeNoRefChunkIndex<T>: TrustedChunkSizedCollection {
     ///
     /// # Panics
     ///
-    /// Panics if `index` is out of bounds of the collection.
+    /// Panics if `index` is out of bounds of the collection or if `out.len() != self.chunk_size()`.
     ///
     /// # Safety
     ///
@@ -408,18 +413,25 @@ pub unsafe trait UnsafeNoRefChunkIndex<T>: TrustedChunkSizedCollection {
     /// ```
     /// # use par_slice::*;
     /// let collection = vec![0; 10].into_par_chunk_index_no_ref(2);
+    /// let mut buf = vec![0; 2];
+    ///
     /// // This is single threaded so no data races can happen
-    /// assert_eq!(unsafe { collection.get(0).as_ref() }, [0, 0]);
+    /// unsafe {
+    ///     collection.get(0, &mut buf);
+    /// }
+    ///
+    /// assert_eq!(buf, vec![0, 0]);
     /// ```
     #[inline(always)]
-    unsafe fn get(&self, index: usize) -> Box<[T]>
+    unsafe fn get<O: AsMut<[T]>>(&self, index: usize, mut out: O) -> O
     where
         T: Copy,
     {
         assert_in_bounds(self.len(), index);
+        assert_chunk_compatible(self.chunk_size(), out.as_mut());
         unsafe {
             // Safety: we just checked that index is in bounds
-            self.get_unchecked(index)
+            self.get_unchecked(index, out)
         }
     }
 
@@ -433,18 +445,25 @@ pub unsafe trait UnsafeNoRefChunkIndex<T>: TrustedChunkSizedCollection {
     ///
     /// Calling this method while also writing to the same chunk from another thread is undefined behavior
     /// (parallel reads are ok).
-    /// Calling this method with an index `i` that would panic [`get`](`Self::get`) is undefined behavior.
+    /// Calling this method with an index `i` or an output `out` that would panic [`set`](`Self::set`)
+    /// is undefined behavior.
     ///
     /// # Examples
     ///
     /// ```
     /// # use par_slice::*;
     /// let collection = vec![0; 10].into_par_chunk_index_no_ref(2);
+    /// let mut buf = vec![0; 2];
+    ///
     /// // We know 0 is a valid index for a collection of length 5
     /// // and this is single threaded so no data races can happen
-    /// assert_eq!(unsafe { collection.get_unchecked(0).as_ref() }, [0, 0]);
+    /// unsafe {
+    ///     collection.get_unchecked(0, &mut buf);
+    /// }
+    ///
+    /// assert_eq!(buf, vec![0, 0]);
     /// ```
-    unsafe fn get_unchecked(&self, index: usize) -> Box<[T]>
+    unsafe fn get_unchecked<O: AsMut<[T]>>(&self, index: usize, out: O) -> O
     where
         T: Copy;
 
@@ -468,9 +487,11 @@ pub unsafe trait UnsafeNoRefChunkIndex<T>: TrustedChunkSizedCollection {
     /// ```
     /// # use par_slice::*;
     /// let collection = vec![0; 10].into_par_chunk_index_no_ref(2);
+    ///
     /// // This is single threaded so no data races can happen
     /// unsafe { collection.set(0, &[42, 69]) };
-    /// assert_eq!(unsafe { collection.get(0).as_ref() }, [42, 69]);
+    ///
+    /// assert_eq!(collection.into(), vec![42, 69, 0, 0, 0, 0, 0, 0, 0, 0]);
     /// ```
     #[inline(always)]
     unsafe fn set(&self, index: usize, value: &[T])
@@ -504,10 +525,12 @@ pub unsafe trait UnsafeNoRefChunkIndex<T>: TrustedChunkSizedCollection {
     /// ```
     /// # use par_slice::*;
     /// let collection = vec![0; 10].into_par_chunk_index_no_ref(2);
+    ///
     /// // We know 0 is a valid index for a collection of length 5
     /// // and this is single threaded so no data races can happen
     /// unsafe { collection.set_unchecked(0, &[42, 69]) };
-    /// assert_eq!(unsafe { collection.get_unchecked(0).as_ref() }, [42, 69]);
+    ///
+    /// assert_eq!(collection.into(), vec![42, 69, 0, 0, 0, 0, 0, 0, 0, 0]);
     /// ```
     unsafe fn set_unchecked(&self, index: usize, value: &[T])
     where

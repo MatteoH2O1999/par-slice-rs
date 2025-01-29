@@ -14,8 +14,12 @@ fn invalid_chunk_size() {
 #[test]
 fn no_thread_unchecked() {
     let slice = vec![1, 2, 3, 4].into_par_chunk_index_no_ref(2);
+    let mut buf = vec![0; 2];
 
-    assert_eq!(unsafe { slice.get_unchecked(0).as_ref() }, &[1, 2]);
+    unsafe {
+        slice.get_unchecked(0, &mut buf);
+    }
+    assert_eq!(buf, &[1, 2]);
     unsafe {
         slice.set_unchecked(1, &[42, 69]);
     }
@@ -26,8 +30,12 @@ fn no_thread_unchecked() {
 #[test]
 fn no_thread_checked() {
     let slice = vec![1, 2, 3, 4].into_par_chunk_index_no_ref(2);
+    let mut buf = vec![0; 2];
 
-    assert_eq!(unsafe { slice.get(0).as_ref() }, &[1, 2]);
+    unsafe {
+        slice.get(0, &mut buf);
+    }
+    assert_eq!(buf, &[1, 2]);
     unsafe {
         slice.set(1, &[42, 69]);
     }
@@ -41,7 +49,7 @@ fn no_thread_checked_panic_get() {
     let slice = vec![1, 2, 3, 4].into_par_chunk_index_no_ref(2);
 
     unsafe {
-        slice.get(42);
+        slice.get(42, vec![0; 2]);
     }
 }
 
@@ -77,7 +85,7 @@ fn single_thread_unchecked() {
 
     scope(|s| {
         s.spawn(|| {
-            assert_eq!(unsafe { slice.get_unchecked(0).as_ref() }, &[1, 2]);
+            assert_eq!(unsafe { slice.get_unchecked(0, vec![0; 2]) }, &[1, 2]);
         })
         .join()
         .unwrap();
@@ -97,7 +105,7 @@ fn single_thread_checked() {
 
     scope(|s| {
         s.spawn(|| {
-            assert_eq!(unsafe { slice.get(0).as_ref() }, &[1, 2]);
+            assert_eq!(unsafe { slice.get(0, vec![0; 2]) }, &[1, 2]);
         })
         .join()
         .unwrap();
@@ -117,7 +125,7 @@ fn single_thread_checked_panic_get() {
 
     scope(|s| {
         s.spawn(|| {
-            unsafe { slice.get(42) };
+            unsafe { slice.get(42, vec![0; 2]) };
         })
         .join()
         .unwrap_err();
@@ -137,7 +145,7 @@ fn single_thread_checked_panic_set() {
 
     scope(|s| {
         s.spawn(|| {
-            assert_eq!(unsafe { slice.get(0).as_ref() }, &[1, 2]);
+            assert_eq!(unsafe { slice.get(0, vec![0; 2]) }, &[1, 2]);
         })
         .join()
         .unwrap();
@@ -161,7 +169,7 @@ fn multithread_unchecked() {
 
     scope(|s| {
         s.spawn(|| {
-            assert_eq!(unsafe { slice.get_unchecked(0).as_ref() }, &[1, 2]);
+            assert_eq!(unsafe { slice.get_unchecked(0, vec![0; 2]) }, &[1, 2]);
         });
         s.spawn(|| {
             unsafe { slice.set_unchecked(1, &[42, 69]) };
@@ -177,7 +185,7 @@ fn multithread_checked() {
 
     scope(|s| {
         s.spawn(|| {
-            assert_eq!(unsafe { slice.get(0).as_ref() }, &[1, 2]);
+            assert_eq!(unsafe { slice.get(0, vec![0; 2]) }, &[1, 2]);
         });
         s.spawn(|| {
             unsafe { slice.set(1, &[42, 69]) };
@@ -196,7 +204,7 @@ fn multithread_checked_panic_get() {
             unsafe { slice.set(1, &[42, 69]) };
         });
         s.spawn(|| {
-            unsafe { slice.get(42).as_ref() };
+            unsafe { slice.get(42, vec![0; 2]) };
         })
         .join()
         .unwrap_err();
@@ -211,7 +219,7 @@ fn multithread_checked_panic_mut() {
 
     scope(|s| {
         s.spawn(|| {
-            assert_eq!(unsafe { slice.get(0).as_ref() }, &[1, 2]);
+            assert_eq!(unsafe { slice.get(0, vec![0; 2]) }, &[1, 2]);
         });
         s.spawn(|| {
             unsafe { slice.set(69, &[1, 2]) };

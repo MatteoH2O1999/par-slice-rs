@@ -143,20 +143,22 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeNoRefChunkIndex<T>
     for UnsafeCellChunkSlice<B>
 {
     #[inline(always)]
-    unsafe fn get_unchecked(&self, index: usize) -> Box<[T]>
+    unsafe fn get_unchecked<O: AsMut<[T]>>(&self, index: usize, mut out: O) -> O
     where
         T: Copy,
     {
+        let slice = out.as_mut();
         debug_assert!(index < self.len);
-        let fat_ptr = self.get_ptr_unchecked(index);
+        debug_assert_eq!(slice.len(), self.chunk_size);
 
-        let mut res = Box::new_uninit_slice(fat_ptr.len());
+        let fat_ptr = self.get_ptr_unchecked(index);
+        debug_assert_eq!(fat_ptr.len(), self.chunk_size);
         let mut ptr = fat_ptr as *const T;
 
-        for elem in res.iter_mut() {
+        for elem in slice {
             unsafe {
                 // Safety: the caller must guarantee that there are no data races
-                elem.write(*ptr);
+                *elem = *ptr;
 
                 // Safety: object is allocated and the caller guarantees that
                 // ptr is in bounds
@@ -164,10 +166,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeNoRefChunkIndex<T>
             }
         }
 
-        unsafe {
-            // Safety: the slice is filled with the correct elements
-            res.assume_init()
-        }
+        out
     }
 
     #[inline(always)]

@@ -18,10 +18,14 @@ fn invalid_chunk_size() {
 #[test]
 fn no_thread_unchecked() {
     let mut v = vec![1, 2, 3, 4];
+    let mut buf = vec![0; 2];
 
     {
         let slice = v.as_par_chunk_index_no_ref(2);
-        assert_eq!(unsafe { slice.get_unchecked(0).as_ref() }, &[1, 2]);
+        unsafe {
+            slice.get_unchecked(0, &mut buf);
+        }
+        assert_eq!(buf, &[1, 2]);
         unsafe {
             slice.set_unchecked(1, &[42, 69]);
         }
@@ -33,10 +37,14 @@ fn no_thread_unchecked() {
 #[test]
 fn no_thread_checked() {
     let mut v = vec![1, 2, 3, 4];
+    let mut buf = vec![0; 2];
 
     {
         let slice = v.as_par_chunk_index_no_ref(2);
-        assert_eq!(unsafe { slice.get(0).as_ref() }, &[1, 2]);
+        unsafe {
+            slice.get(0, &mut buf);
+        }
+        assert_eq!(buf, &[1, 2]);
         unsafe {
             slice.set(1, &[42, 69]);
         }
@@ -49,11 +57,12 @@ fn no_thread_checked() {
 #[should_panic(expected = "Index 42 invalid for slice of len 2")]
 fn no_thread_checked_panic_get() {
     let mut v = vec![1, 2, 3, 4];
+    let mut buf = vec![0; 2];
 
     {
         let slice = v.as_par_chunk_index_no_ref(2);
         unsafe {
-            slice.get(42);
+            slice.get(42, &mut buf);
         }
     }
 }
@@ -98,7 +107,7 @@ fn single_thread_unchecked() {
         let slice = v.as_par_chunk_index_no_ref(2);
         scope(|s| {
             s.spawn(|| {
-                assert_eq!(unsafe { slice.get_unchecked(0).as_ref() }, &[1, 2]);
+                assert_eq!(unsafe { slice.get_unchecked(0, vec![0; 2]) }, &[1, 2]);
             })
             .join()
             .unwrap();
@@ -121,7 +130,7 @@ fn single_thread_checked() {
         let slice = v.as_par_chunk_index_no_ref(2);
         scope(|s| {
             s.spawn(|| {
-                assert_eq!(unsafe { slice.get(0).as_ref() }, &[1, 2]);
+                assert_eq!(unsafe { slice.get(0, vec![0; 2]) }, &[1, 2]);
             })
             .join()
             .unwrap();
@@ -144,7 +153,7 @@ fn single_thread_checked_panic_get() {
         let slice = v.as_par_chunk_index_no_ref(2);
         scope(|s| {
             s.spawn(|| {
-                unsafe { slice.get(42) };
+                unsafe { slice.get(42, vec![0; 2]) };
             })
             .join()
             .unwrap_err();
@@ -167,7 +176,7 @@ fn single_thread_checked_panic_set() {
         let slice = v.as_par_chunk_index_no_ref(2);
         scope(|s| {
             s.spawn(|| {
-                assert_eq!(unsafe { slice.get(0).as_ref() }, &[1, 2]);
+                assert_eq!(unsafe { slice.get(0, vec![0; 2]) }, &[1, 2]);
             })
             .join()
             .unwrap();
@@ -194,7 +203,7 @@ fn multithread_unchecked() {
         let slice = v.as_par_chunk_index_no_ref(2);
         scope(|s| {
             s.spawn(|| {
-                assert_eq!(unsafe { slice.get_unchecked(0).as_ref() }, &[1, 2]);
+                assert_eq!(unsafe { slice.get_unchecked(0, vec![0; 2]) }, &[1, 2]);
             });
             s.spawn(|| {
                 unsafe { slice.set_unchecked(1, &[42, 69]) };
@@ -213,7 +222,7 @@ fn multithread_checked() {
         let slice = v.as_par_chunk_index_no_ref(2);
         scope(|s| {
             s.spawn(|| {
-                assert_eq!(unsafe { slice.get(0).as_ref() }, &[1, 2]);
+                assert_eq!(unsafe { slice.get(0, vec![0; 2]) }, &[1, 2]);
             });
             s.spawn(|| {
                 unsafe { slice.set(1, &[42, 69]) };
@@ -235,7 +244,7 @@ fn multithread_checked_panic_get() {
                 unsafe { slice.set(1, &[42, 69]) };
             });
             s.spawn(|| {
-                unsafe { slice.get(42).as_ref() };
+                unsafe { slice.get(42, vec![0; 2]) };
             })
             .join()
             .unwrap_err();
@@ -253,7 +262,7 @@ fn multithread_checked_panic_mut() {
         let slice = v.as_par_chunk_index_no_ref(2);
         scope(|s| {
             s.spawn(|| {
-                assert_eq!(unsafe { slice.get(0).as_ref() }, &[1, 2]);
+                assert_eq!(unsafe { slice.get(0, vec![0; 2]) }, &[1, 2]);
             });
             s.spawn(|| {
                 unsafe { slice.set(69, &[1, 2]) };
