@@ -114,7 +114,7 @@ pub unsafe trait PointerIndex<T: ?Sized>: TrustedSizedCollection {
     /// bounds checking.
     ///
     /// This method does not perform bounds checking on `index` to ensure its validity.
-    /// If you can't ensure its validity, you may want to use the [`get_ptr`](`Self::get_ptr`) method instead.
+    /// If you can't guarantee its validity, you may want to use the [`get_ptr`](`Self::get_ptr`) method instead.
     ///
     /// # Safety
     ///
@@ -135,7 +135,7 @@ pub unsafe trait PointerIndex<T: ?Sized>: TrustedSizedCollection {
     /// bounds checking.
     ///
     /// This method does not performs bounds checking on `index` to ensure its validity.
-    /// If you can't ensure its validity, you may want to use the [`get_mut_ptr`](`Self::get_mut_ptr`) method instead.
+    /// If you can't guarantee its validity, you may want to use the [`get_mut_ptr`](`Self::get_mut_ptr`) method instead.
     ///
     /// # Safety
     ///
@@ -157,7 +157,7 @@ pub unsafe trait PointerIndex<T: ?Sized>: TrustedSizedCollection {
     /// Returns an immutable pointer to the element identified by `index` in the collection.
     ///
     /// This method performs bounds checking on `index` to ensure its validity.
-    /// If you can ensure its validity, you may want to use the [`get_ptr_unchecked`](`Self::get_ptr_unchecked`)
+    /// If you can guarantee its validity, you may want to use the [`get_ptr_unchecked`](`Self::get_ptr_unchecked`)
     /// method instead.
     ///
     /// # Panics
@@ -185,7 +185,7 @@ pub unsafe trait PointerIndex<T: ?Sized>: TrustedSizedCollection {
     /// Returns a mutable reference to the element identified by `index` in the collection.
     ///
     /// This method performs bounds checking on `index` to ensure its validity.
-    /// If you can ensure its validity, you may want to use the [`get_mut_ptr_unchecked`](`Self::get_mut_ptr_unchecked`)
+    /// If you can guarantee its validity, you may want to use the [`get_mut_ptr_unchecked`](`Self::get_mut_ptr_unchecked`)
     /// method instead.
     ///
     /// # Panics

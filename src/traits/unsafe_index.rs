@@ -135,7 +135,7 @@ pub unsafe trait UnsafeIndex<T: ?Sized>: TrustedSizedCollection {
     /// Returns a shared reference to the element identified by `index` in the collection.
     ///
     /// This method performs bounds checking on `index` to ensure its validity.
-    /// If you can ensure its validity, you may want to use the [`get_unchecked`](`Self::get_unchecked`)
+    /// If you can guarantee its validity, you may want to use the [`get_unchecked`](`Self::get_unchecked`)
     /// method instead.
     ///
     /// # Panics
@@ -167,7 +167,7 @@ pub unsafe trait UnsafeIndex<T: ?Sized>: TrustedSizedCollection {
     /// bounds checking.
     ///
     /// This method does not perform bounds checking on `index` to ensure its validity.
-    /// If you can't ensure its validity, you may want to use the [`get`](`Self::get`) method instead.
+    /// If you can't guarantee its validity, you may want to use the [`get`](`Self::get`) method instead.
     ///
     /// # Safety
     ///
@@ -188,7 +188,7 @@ pub unsafe trait UnsafeIndex<T: ?Sized>: TrustedSizedCollection {
     /// Returns a mutable reference to the element identified by `index` in the collection.
     ///
     /// This method performs bounds checking on `index` to ensure its validity.
-    /// If you can ensure its validity, you may want to use the [`get_mut_unchecked`](`Self::get_mut_unchecked`)
+    /// If you can guarantee its validity, you may want to use the [`get_mut_unchecked`](`Self::get_mut_unchecked`)
     /// method instead.
     ///
     /// # Panics
@@ -225,7 +225,7 @@ pub unsafe trait UnsafeIndex<T: ?Sized>: TrustedSizedCollection {
     /// bounds checking.
     ///
     /// This method does not performs bounds checking on `index` to ensure its validity.
-    /// If you can't ensure its validity, you may want to use the [`get_mut`](`Self::get_mut`) method instead.
+    /// If you can't guarantee its validity, you may want to use the [`get_mut`](`Self::get_mut`) method instead.
     ///
     /// # Safety
     ///

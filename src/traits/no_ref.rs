@@ -134,7 +134,7 @@ pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
     /// Returns a bitwise copy of the element identified by `index` in the collection.
     ///
     /// This method performs bounds checking on `index` to ensure its validity.
-    /// If you can ensure its validity, you may want to use the [`get_unchecked`](`Self::get_unchecked`)
+    /// If you can guarantee its validity, you may want to use the [`get_unchecked`](`Self::get_unchecked`)
     /// method instead.
     ///
     /// # Panics
@@ -170,7 +170,7 @@ pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
     /// bounds checking.
     ///
     /// This method does not perform bounds checking on `index` to ensure its validity.
-    /// If you can't ensure its validity, you may want to use the [`get`](`Self::get`) method instead.
+    /// If you can't guarantee its validity, you may want to use the [`get`](`Self::get`) method instead.
     ///
     /// # Safety
     ///
@@ -194,7 +194,7 @@ pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
     /// Sets the element identified by `index` in the collection to `value`.
     ///
     /// This method performs bounds checking on `index` to ensure its validity.
-    /// If you can ensure its validity, you may want to use the [`set_unchecked`](`Self::set_unchecked`)
+    /// If you can guarantee its validity, you may want to use the [`set_unchecked`](`Self::set_unchecked`)
     /// method instead.
     ///
     /// # Panics
@@ -233,7 +233,7 @@ pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
     /// bounds checking.
     ///
     /// This method does not perform bounds checking on `index` to ensure its validity.
-    /// If you can't ensure its validity, you may want to use the [`set`](`Self::set`) method instead.
+    /// If you can't guarantee its validity, you may want to use the [`set`](`Self::set`) method instead.
     ///
     /// # Safety
     ///
@@ -397,8 +397,8 @@ pub unsafe trait UnsafeNoRefChunkIndex<T>: TrustedChunkSizedCollection {
     /// Sets `out` to a bitwise copy of the chunk of elements identified by `index` in
     /// the collection.
     ///
-    /// This method performs bounds checking on `index` to ensure its validity.
-    /// If you can ensure its validity, you may want to use the [`get_unchecked`](`Self::get_unchecked`)
+    /// This method performs runtime checks on `index` and `out` to ensure their validity.
+    /// If you can guarantee their validity, you may want to use the [`get_unchecked`](`Self::get_unchecked`)
     /// method instead.
     ///
     /// # Panics
@@ -440,8 +440,8 @@ pub unsafe trait UnsafeNoRefChunkIndex<T>: TrustedChunkSizedCollection {
     /// Sets `out` to a bitwise copy of the chunk of elements identified by `index` in the collection,
     /// without performing bounds checking.
     ///
-    /// This method does not perform bounds checking on `index` to ensure its validity.
-    /// If you can't ensure its validity, you may want to use the [`get`](`Self::get`) method instead.
+    /// This method does not perform runtime checks on `index` or `out` to ensure their validity.
+    /// If you can't guarantee their validity, you may want to use the [`get`](`Self::get`) method instead.
     ///
     /// # Safety
     ///
@@ -472,7 +472,7 @@ pub unsafe trait UnsafeNoRefChunkIndex<T>: TrustedChunkSizedCollection {
     /// Sets the chunk of elements identified by `index` in the collection to `value`.
     ///
     /// This method performs runtime checks on `index` and `value` to ensure their validity.
-    /// If you can ensure their validity, you may want to use the [`set_unchecked`](`Self::set_unchecked`)
+    /// If you can guarantee their validity, you may want to use the [`set_unchecked`](`Self::set_unchecked`)
     /// method instead.
     ///
     /// # Panics
@@ -513,7 +513,7 @@ pub unsafe trait UnsafeNoRefChunkIndex<T>: TrustedChunkSizedCollection {
     /// runtime checks on the arguments.
     ///
     /// This method does not perform runtime checks on `index` and `value` to ensure their validity.
-    /// If you can't ensure their validity, you may want to use the [`set`](`Self::set`) method instead.
+    /// If you can't guarantee their validity, you may want to use the [`set`](`Self::set`) method instead.
     ///
     /// # Safety
     ///
