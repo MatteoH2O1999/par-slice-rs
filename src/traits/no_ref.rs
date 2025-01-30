@@ -284,7 +284,7 @@ pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
 /// * For each index `i`, `collection.get(i, out)` sets `out` to a bitwise copy of the chunk of elements identified
 ///   by index `i` in the collection, panicking whenever `i` is out of bounds or `out` has not the same size as
 ///   [`chunk_size`](`TrustedChunkSizedCollection::chunk_size`). It is still up to the caller to ensure no data races can happen during the read.
-/// * For each index `i`, `collection.get_unchecked(i)` sets `out` to a bitwise copy of the chunk of elements
+/// * For each index `i`, `collection.get_unchecked(i, out)` sets `out` to a bitwise copy of the chunk of elements
 ///   identified by index `i` in the collection. It is up to the caller to ensure no data races can happen during the read and that `out`
 ///   is a slice of the correct length.
 /// * For each index `i`, `collection.set(i, value)` sets the chunk of elements identified by index `i` in the collection to `value`,
