@@ -99,7 +99,8 @@
 //! But why should I want this?
 //!
 //! This is particularily useful in `Breadth-First visits` situations, especially on
-//! data structures like graphs.
+//! data structures like graphs, when we want to be able to access in parallel
+//! arbitrary data but with the BFS guarantee of not visiting the same node twice.
 //!
 //! Take the following trait for instance:
 //!
