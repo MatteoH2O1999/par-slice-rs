@@ -84,7 +84,7 @@
 //! each with their invariants:
 //! * [`PointerIndex`] and [`PointerChunkIndex`] allow access through pointers, allowing the
 //!   maximum safety at the cost of ergonomics: creating the pointers is always safe,
-//!   but dereferencing them while avoiding data races and abiding by Rust's alising
+//!   but dereferencing them while avoiding data races and abiding by Rust's aliasing
 //!   rules is up to the user.
 //! * [`UnsafeNoRefIndex`] and [`UnsafeNoRefChunkIndex`] allow access through setters and
 //!   getters. This allows the user to not think about reference aliasing and lifetimes
