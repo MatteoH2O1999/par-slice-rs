@@ -96,6 +96,60 @@
 //!
 //! # Real-World Use Case
 //!
+//! But why should I want this?
+//!
+//! This is particularily important in `Breadth-First visits` situations, especially on
+//! data structures like graphs.
+//!
+//! Take the following trait for instance:
+//!
+//! ```
+//! pub trait Graph {
+//!     fn num_nodes(&self) -> usize;
+//!     fn successors(&self, index: usize) -> impl Iterator<Item = usize>;
+//! }
+//! ```
+//!
+//! Implementing a breadth-first visit from this trait is easy:
+//!
+//! ```
+//!# use std::sync::atomic::*;
+//!# use std::sync::Mutex;
+//!# use std::thread:scope;
+//!# pub trait Graph {
+//!#     fn num_nodes(&self) -> usize;
+//!#     fn successors(&self, index: usize) -> impl Iterator<Item = usize>;
+//!# }
+//!#
+//! const NUM_THREADS: usize = 4;
+//!
+//! pub fn breadth_first_visit<G: Graph>(graph: G, start: usize) {
+//!     let visited: Vec<AtomicBool> = (0..graph.num_nodes()).map(|_| AtomicBool::new(false)).collect();
+//!     let mut current_frontier = vec![start];
+//!     let mut next_frontier = Mutex::new(Vec::new());
+//!     let cursor = AtomicUsize::new(0);
+//!
+//!     while !current_frontier.is_empty() {
+//!         cursor.store(0, Ordering::Relaxed);
+//!         scope(|s|{
+//!             for _ in 0..NUM_THREADS {
+//!                 s.spawn(||{
+//!                     while let Some(&node) = current_frontier.get(cursor.fetch_add(1, Ordering::Relaxed)) {
+//!                         for &succ in graph.successors(node) {
+//!                             if !visited[succ].swap(true, Ordering::Relaxed) {
+//!                                 next_frontier.lock().unwrap().push(succ);
+//!                             }
+//!                         }
+//!                     }
+//!                 });
+//!             }
+//!         });
+//!         current_frontier.clear();
+//!         std::mem::swap(&mut current_frontier, &mut next_frontier.lock().unwrap());
+//!     }
+//! }
+//! ```
+//!
 //! [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
 mod impls;
 pub use impls::*;
