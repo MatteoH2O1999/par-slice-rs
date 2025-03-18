@@ -98,7 +98,7 @@
 //!
 //! But why should I want this?
 //!
-//! This is particularily important in `Breadth-First visits` situations, especially on
+//! This is particularily useful in `Breadth-First visits` situations, especially on
 //! data structures like graphs.
 //!
 //! Take the following trait for instance:
@@ -115,7 +115,7 @@
 //! ```
 //!# use std::sync::atomic::*;
 //!# use std::sync::Mutex;
-//!# use std::thread:scope;
+//!# use std::thread::scope;
 //!# pub trait Graph {
 //!#     fn num_nodes(&self) -> usize;
 //!#     fn successors(&self, index: usize) -> impl Iterator<Item = usize>;
@@ -123,19 +123,20 @@
 //!#
 //! const NUM_THREADS: usize = 4;
 //!
-//! pub fn breadth_first_visit<G: Graph>(graph: G, start: usize) {
+//! pub fn breadth_first_visit(graph: impl Graph + Sync, start: usize) {
 //!     let visited: Vec<AtomicBool> = (0..graph.num_nodes()).map(|_| AtomicBool::new(false)).collect();
 //!     let mut current_frontier = vec![start];
 //!     let mut next_frontier = Mutex::new(Vec::new());
 //!     let cursor = AtomicUsize::new(0);
+//!     visited[start].store(true, Ordering::Relaxed);
 //!
 //!     while !current_frontier.is_empty() {
 //!         cursor.store(0, Ordering::Relaxed);
-//!         scope(|s|{
+//!         scope(|s| {
 //!             for _ in 0..NUM_THREADS {
-//!                 s.spawn(||{
+//!                 s.spawn(|| {
 //!                     while let Some(&node) = current_frontier.get(cursor.fetch_add(1, Ordering::Relaxed)) {
-//!                         for &succ in graph.successors(node) {
+//!                         for succ in graph.successors(node) {
 //!                             if !visited[succ].swap(true, Ordering::Relaxed) {
 //!                                 next_frontier.lock().unwrap().push(succ);
 //!                             }
@@ -147,6 +148,116 @@
 //!         current_frontier.clear();
 //!         std::mem::swap(&mut current_frontier, &mut next_frontier.lock().unwrap());
 //!     }
+//! }
+//! ```
+//!
+//! But what if we wanted to execute arbitrary code for every node?
+//!
+//! ```compile_fail
+//!# use std::sync::atomic::*;
+//!# use std::sync::Mutex;
+//!# use std::thread::scope;
+//!# pub trait Graph {
+//!#     fn num_nodes(&self) -> usize;
+//!#     fn successors(&self, index: usize) -> impl Iterator<Item = usize>;
+//!# }
+//!#
+//! const NUM_THREADS: usize = 4;
+//!
+//! // This does not compile as closure must be Sync
+//! pub fn breadth_first_visit(graph: impl Graph + Sync, start: usize, mut closure: impl FnMut(usize, usize) + Sync) {
+//!     let visited: Vec<AtomicBool> = (0..graph.num_nodes()).map(|_| AtomicBool::new(false)).collect();
+//!     let mut current_frontier = vec![start];
+//!     let mut next_frontier = Mutex::new(Vec::new());
+//!     let cursor = AtomicUsize::new(0);
+//!     let mut dist = 0;
+//!     visited[start].store(true, Ordering::Relaxed);
+//!
+//!     while !current_frontier.is_empty() {
+//!         cursor.store(0, Ordering::Relaxed);
+//!         scope(|s| {
+//!             for _ in 0..NUM_THREADS {
+//!                 s.spawn(|| {
+//!                     while let Some(&node) = current_frontier.get(cursor.fetch_add(1, Ordering::Relaxed)) {
+//!                         closure(node, dist);
+//!                         for succ in graph.successors(node) {
+//!                             if !visited[succ].swap(true, Ordering::Relaxed) {
+//!                                 next_frontier.lock().unwrap().push(succ);
+//!                             }
+//!                         }
+//!                     }
+//!                 });
+//!             }
+//!         });
+//!         dist += 1;
+//!         current_frontier.clear();
+//!         std::mem::swap(&mut current_frontier, &mut next_frontier.lock().unwrap());
+//!     }
+//! }
+//!
+//! pub fn compute_dists(graph: impl Graph + Sync, start: usize) -> Vec<usize> {
+//!     let mut dists = vec![usize::MAX; graph.num_nodes()];
+//!     breadth_first_visit(graph, start, |node, dist| dists[node] = dist);
+//!     dists
+//! }
+//! ```
+//!
+//! This compiles but limits heavily what we can do in the closure: this is where this
+//! crate comes in as we know no node is ever visited twice.
+//! Thus we can update `dists` without using atomics.
+//!
+//! ```
+//!# use std::sync::atomic::*;
+//!# use std::sync::Mutex;
+//!# use std::thread::scope;
+//!# pub trait Graph {
+//!#     fn num_nodes(&self) -> usize;
+//!#     fn successors(&self, index: usize) -> impl Iterator<Item = usize>;
+//!# }
+//!#
+//! use par_slice::*;
+//! const NUM_THREADS: usize = 4;
+//!
+//! pub fn breadth_first_visit(graph: impl Graph + Sync, start: usize, closure: impl Fn(usize, usize) + Sync) {
+//!     let visited: Vec<AtomicBool> = (0..graph.num_nodes()).map(|_| AtomicBool::new(false)).collect();
+//!     let mut current_frontier = vec![start];
+//!     let mut next_frontier = Mutex::new(Vec::new());
+//!     let cursor = AtomicUsize::new(0);
+//!     let mut dist = 0;
+//!     visited[start].store(true, Ordering::Relaxed);
+//!
+//!     while !current_frontier.is_empty() {
+//!         cursor.store(0, Ordering::Relaxed);
+//!         scope(|s| {
+//!             for _ in 0..NUM_THREADS {
+//!                 s.spawn(|| {
+//!                     while let Some(&node) = current_frontier.get(cursor.fetch_add(1, Ordering::Relaxed)) {
+//!                         closure(node, dist);
+//!                         for succ in graph.successors(node) {
+//!                             if !visited[succ].swap(true, Ordering::Relaxed) {
+//!                                 next_frontier.lock().unwrap().push(succ);
+//!                             }
+//!                         }
+//!                     }
+//!                 });
+//!             }
+//!         });
+//!         dist += 1;
+//!         current_frontier.clear();
+//!         std::mem::swap(&mut current_frontier, &mut next_frontier.lock().unwrap());
+//!     }
+//! }
+//!
+//! pub fn compute_dists(graph: impl Graph + Sync, start: usize) -> Vec<usize> {
+//!     let mut dists = vec![usize::MAX; graph.num_nodes()];
+//!     {
+//!         let dists_shared = dists.as_par_index();
+//!         breadth_first_visit(graph, start, |node, dist| {
+//!             let node_ref = unsafe { dists_shared.get_mut_unchecked(node) };
+//!             *node_ref = dist;
+//!         });
+//!     }
+//!     dists
 //! }
 //! ```
 //!
