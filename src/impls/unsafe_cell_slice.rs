@@ -52,7 +52,9 @@ impl<T> UnsafeCellSlice<Box<UnsafeCell<[T]>>> {
     }
 }
 
-unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedSizedCollection for UnsafeCellSlice<B> {
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedSizedCollection<T>
+    for UnsafeCellSlice<B>
+{
     #[inline]
     fn len(&self) -> usize {
         self.0.get().len()

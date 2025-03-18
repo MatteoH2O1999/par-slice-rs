@@ -109,7 +109,7 @@ use crate::*;
 /// ```
 ///
 /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
-pub unsafe trait PointerIndex<T: ?Sized>: TrustedSizedCollection {
+pub unsafe trait PointerIndex<T: ?Sized>: TrustedSizedCollection<T> {
     /// Returns an immutable pointer to the element identified by `index` in the collection, without performing
     /// bounds checking.
     ///
@@ -232,6 +232,6 @@ pub unsafe trait PointerIndex<T: ?Sized>: TrustedSizedCollection {
 /// * The collection implements [`PointerIndex<[T]>`](`PointerIndex`) where `[T]` is a chunk, so `[T].len() == collection.chunk_size()`,
 ///   and where all the methods' indexes refer to the chunk indexes as defined above.
 pub unsafe trait PointerChunkIndex<T>:
-    PointerIndex<[T]> + TrustedChunkSizedCollection
+    PointerIndex<[T]> + TrustedChunkSizedCollection<T>
 {
 }
