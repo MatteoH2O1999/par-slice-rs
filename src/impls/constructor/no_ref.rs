@@ -16,7 +16,7 @@ impl NoRefParSlice {
     /// let data_race_slice = NoRefParSlice::new(4);
     ///
     /// unsafe {
-    ///     data_race_slice.set(0, 42);
+    ///     data_race_slice.set_value(0, 42);
     /// }
     ///
     /// assert_eq!(data_race_slice.into().as_ref(), &[42, 0, 0, 0]);
@@ -40,7 +40,7 @@ impl NoRefParSlice {
     /// let data_race_slice = NoRefParSlice::with_value(69, 4);
     ///
     /// unsafe {
-    ///     data_race_slice.set(0, 42);
+    ///     data_race_slice.set_value(0, 42);
     /// }
     ///
     /// assert_eq!(data_race_slice.into().as_ref(), &[42, 69, 69, 69]);
@@ -65,7 +65,7 @@ impl NoRefParSlice {
     /// let data_race_slice = NoRefParSlice::with_closure(|i| i, 4);
     ///
     /// unsafe {
-    ///     data_race_slice.set(0, 42);
+    ///     data_race_slice.set_value(0, 42);
     /// }
     ///
     /// assert_eq!(data_race_slice.into().as_ref(), &[42, 1, 2, 3]);
@@ -89,7 +89,7 @@ impl NoRefParSlice {
     /// let data_race_slice = NoRefParSlice::new_chunks(4, 2);
     ///
     /// unsafe {
-    ///     data_race_slice.set(0, &[42, 0]);
+    ///     data_race_slice.set_values(0, &[42, 0]);
     /// }
     ///
     /// assert_eq!(data_race_slice.into().as_ref(), &[42, 0, 0, 0]);
@@ -114,7 +114,7 @@ impl NoRefParSlice {
     /// let data_race_slice = NoRefParSlice::chunks_with_value(69, 4, 2);
     ///
     /// unsafe {
-    ///     data_race_slice.set(0, &[42, 69]);
+    ///     data_race_slice.set_values(0, &[42, 69]);
     /// }
     ///
     /// assert_eq!(data_race_slice.into().as_ref(), &[42, 69, 69, 69]);
@@ -141,7 +141,7 @@ impl NoRefParSlice {
     /// let data_race_slice = NoRefParSlice::chunks_with_closure(|i| i, 4, 2);
     ///
     /// unsafe {
-    ///     data_race_slice.set(0, &[42, 1]);
+    ///     data_race_slice.set_values(0, &[42, 1]);
     /// }
     ///
     /// assert_eq!(data_race_slice.into().as_ref(), &[42, 1, 2, 3]);

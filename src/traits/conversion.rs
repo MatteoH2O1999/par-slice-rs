@@ -69,7 +69,7 @@ use crate::*;
 ///     // Let's use setters and getters to chunks of size 2
 ///     let view = collection.as_par_chunk_index_no_ref(2);
 ///     unsafe {
-///         view.set(1, &[69, 69]);
+///         view.set_values(1, &[69, 69]);
 ///     }
 /// }
 ///
@@ -127,9 +127,9 @@ pub unsafe trait ParIndexView<T> {
     /// {
     ///     let view = collection.as_par_index_no_ref();
     ///     unsafe {
-    ///         view.set(1, 42);
-    ///         view.set(5, 69);
-    ///         assert_eq!(view.get(2), 2);
+    ///         view.set_value(1, 42);
+    ///         view.set_value(5, 69);
+    ///         assert_eq!(view.get_value(2), 2);
     ///     }
     /// }
     ///
@@ -207,9 +207,9 @@ pub unsafe trait ParIndexView<T> {
     /// {
     ///     let view = collection.as_par_chunk_index_no_ref(5);
     ///     unsafe {
-    ///         view.set(0, &[0, 42, 2, 3, 4]);
-    ///         view.set(1, &[69, 6, 7, 8, 9]);
-    ///         assert_eq!(view.get(1, vec![0; 5]), vec![69, 6, 7, 8, 9]);
+    ///         view.set_values(0, &[0, 42, 2, 3, 4]);
+    ///         view.set_values(1, &[69, 6, 7, 8, 9]);
+    ///         assert_eq!(view.get_values(1, vec![0; 5]), vec![69, 6, 7, 8, 9]);
     ///     }
     /// }
     ///
@@ -319,7 +319,7 @@ pub unsafe trait ParIndexView<T> {
 /// let par_collection = collection.into_par_chunk_index_no_ref(2);
 ///
 /// unsafe {
-///     par_collection.set(1, &[69, 69]);
+///     par_collection.set_values(1, &[69, 69]);
 /// }
 ///
 /// collection = par_collection.into();
@@ -372,9 +372,9 @@ pub unsafe trait IntoParIndex<T>: Sized {
     /// let collection = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9].into_par_index_no_ref();
     ///
     /// unsafe {
-    ///     collection.set(1, 42);
-    ///     collection.set(5, 69);
-    ///     assert_eq!(collection.get(2), 2);
+    ///     collection.set_value(1, 42);
+    ///     collection.set_value(5, 69);
+    ///     assert_eq!(collection.get_value(2), 2);
     /// }
     ///
     /// assert_eq!(collection.into(), vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);
@@ -443,9 +443,9 @@ pub unsafe trait IntoParIndex<T>: Sized {
     /// let collection = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9].into_par_chunk_index_no_ref(5);
     ///
     /// unsafe {
-    ///     collection.set(0, &[0, 42, 2, 3, 4]);
-    ///     collection.set(1, &[69, 6, 7, 8, 9]);
-    ///     assert_eq!(collection.get(1, vec![0; 5]).as_ref(), vec![69, 6, 7, 8, 9]);
+    ///     collection.set_values(0, &[0, 42, 2, 3, 4]);
+    ///     collection.set_values(1, &[69, 6, 7, 8, 9]);
+    ///     assert_eq!(collection.get_values(1, vec![0; 5]).as_ref(), vec![69, 6, 7, 8, 9]);
     /// }
     ///
     /// assert_eq!(collection.into(), vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);

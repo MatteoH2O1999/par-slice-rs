@@ -11,9 +11,9 @@ fn no_thread_unchecked() {
 
     {
         let slice = v.as_par_index_no_ref();
-        assert_eq!(unsafe { slice.get_unchecked(1) }, 2);
+        assert_eq!(unsafe { slice.get_value_unchecked(1) }, 2);
         unsafe {
-            slice.set_unchecked(2, 42);
+            slice.set_value_unchecked(2, 42);
         }
     }
 
@@ -26,9 +26,9 @@ fn no_thread_checked() {
 
     {
         let slice = v.as_par_index_no_ref();
-        assert_eq!(unsafe { slice.get(1) }, 2);
+        assert_eq!(unsafe { slice.get_value(1) }, 2);
         unsafe {
-            slice.set(2, 42);
+            slice.set_value(2, 42);
         }
     }
 
@@ -43,7 +43,7 @@ fn no_thread_checked_panic_get() {
     {
         let slice = v.as_par_index_no_ref();
         unsafe {
-            slice.get(42);
+            slice.get_value(42);
         }
     }
 }
@@ -56,7 +56,7 @@ fn no_thread_checked_panic_set() {
     {
         let slice = v.as_par_index_no_ref();
         unsafe {
-            slice.set(69, 42);
+            slice.set_value(69, 42);
         }
     }
 }
@@ -73,12 +73,12 @@ fn single_thread_unchecked() {
         let slice = v.as_par_index_no_ref();
         scope(|s| {
             s.spawn(|| {
-                assert_eq!(unsafe { slice.get_unchecked(1) }, 2);
+                assert_eq!(unsafe { slice.get_value_unchecked(1) }, 2);
             })
             .join()
             .unwrap();
             s.spawn(|| {
-                unsafe { slice.set_unchecked(2, 42) };
+                unsafe { slice.set_value_unchecked(2, 42) };
             })
             .join()
             .unwrap();
@@ -96,12 +96,12 @@ fn single_thread_checked() {
         let slice = v.as_par_index_no_ref();
         scope(|s| {
             s.spawn(|| {
-                assert_eq!(unsafe { slice.get(1) }, 2);
+                assert_eq!(unsafe { slice.get_value(1) }, 2);
             })
             .join()
             .unwrap();
             s.spawn(|| {
-                unsafe { slice.set(2, 42) };
+                unsafe { slice.set_value(2, 42) };
             })
             .join()
             .unwrap();
@@ -119,12 +119,12 @@ fn single_thread_checked_panic_get() {
         let slice = v.as_par_index_no_ref();
         scope(|s| {
             s.spawn(|| {
-                unsafe { slice.get(42) };
+                unsafe { slice.get_value(42) };
             })
             .join()
             .unwrap_err();
             s.spawn(|| {
-                unsafe { slice.set(2, 42) };
+                unsafe { slice.set_value(2, 42) };
             })
             .join()
             .unwrap();
@@ -142,12 +142,12 @@ fn single_thread_checked_panic_set() {
         let slice = v.as_par_index_no_ref();
         scope(|s| {
             s.spawn(|| {
-                assert_eq!(unsafe { slice.get(1) }, 2);
+                assert_eq!(unsafe { slice.get_value(1) }, 2);
             })
             .join()
             .unwrap();
             s.spawn(|| {
-                unsafe { slice.set(69, 42) };
+                unsafe { slice.set_value(69, 42) };
             })
             .join()
             .unwrap_err();
@@ -169,10 +169,10 @@ fn multithread_unchecked() {
         let slice = v.as_par_index_no_ref();
         scope(|s| {
             s.spawn(|| {
-                assert_eq!(unsafe { slice.get_unchecked(1) }, 2);
+                assert_eq!(unsafe { slice.get_value_unchecked(1) }, 2);
             });
             s.spawn(|| {
-                unsafe { slice.set_unchecked(2, 42) };
+                unsafe { slice.set_value_unchecked(2, 42) };
             });
         });
     }
@@ -188,10 +188,10 @@ fn multithread_checked() {
         let slice = v.as_par_index_no_ref();
         scope(|s| {
             s.spawn(|| {
-                assert_eq!(unsafe { slice.get(1) }, 2);
+                assert_eq!(unsafe { slice.get_value(1) }, 2);
             });
             s.spawn(|| {
-                unsafe { slice.set(2, 42) };
+                unsafe { slice.set_value(2, 42) };
             });
         });
     }
@@ -207,10 +207,10 @@ fn multithread_checked_panic_get() {
         let slice = v.as_par_index_no_ref();
         scope(|s| {
             s.spawn(|| {
-                unsafe { slice.set(2, 42) };
+                unsafe { slice.set_value(2, 42) };
             });
             s.spawn(|| {
-                unsafe { slice.get(42) };
+                unsafe { slice.get_value(42) };
             })
             .join()
             .unwrap_err();
@@ -228,10 +228,10 @@ fn multithread_checked_panic_mut() {
         let slice = v.as_par_index_no_ref();
         scope(|s| {
             s.spawn(|| {
-                assert_eq!(unsafe { slice.get(1) }, 2);
+                assert_eq!(unsafe { slice.get_value(1) }, 2);
             });
             s.spawn(|| {
-                unsafe { slice.set(69, 42) };
+                unsafe { slice.set_value(69, 42) };
             })
             .join()
             .unwrap_err();
