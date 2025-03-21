@@ -25,7 +25,7 @@ impl ParSlice {
     #[inline]
     pub fn new<T: Default + Send + Sync>(
         len: usize,
-    ) -> impl UnsafeIndex<T> + ParCollection<Box<[T]>> {
+    ) -> impl UnsafeIndex<T> + ParCollection<T, Box<[T]>> {
         new_boxed_slice(len).into_par_index()
     }
 
@@ -49,7 +49,7 @@ impl ParSlice {
     pub fn with_value<T: Clone + Send + Sync>(
         value: T,
         len: usize,
-    ) -> impl UnsafeIndex<T> + ParCollection<Box<[T]>> {
+    ) -> impl UnsafeIndex<T> + ParCollection<T, Box<[T]>> {
         new_boxed_slice_with_value(len, value).into_par_index()
     }
 
@@ -74,7 +74,7 @@ impl ParSlice {
     pub fn with_closure<T: Send + Sync>(
         closure: impl FnMut(usize) -> T,
         len: usize,
-    ) -> impl UnsafeIndex<T> + ParCollection<Box<[T]>> {
+    ) -> impl UnsafeIndex<T> + ParCollection<T, Box<[T]>> {
         new_boxed_slice_with(len, closure).into_par_index()
     }
 
@@ -98,7 +98,7 @@ impl ParSlice {
     pub fn new_chunks<T: Default + Send + Sync>(
         len: usize,
         chunk_size: usize,
-    ) -> impl UnsafeChunkIndex<T> + ParCollection<Box<[T]>> {
+    ) -> impl UnsafeChunkIndex<T> + ParCollection<[T], Box<[T]>> {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice(len).into_par_chunk_index(chunk_size)
     }
@@ -124,7 +124,7 @@ impl ParSlice {
         value: T,
         len: usize,
         chunk_size: usize,
-    ) -> impl UnsafeChunkIndex<T> + ParCollection<Box<[T]>> {
+    ) -> impl UnsafeChunkIndex<T> + ParCollection<[T], Box<[T]>> {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice_with_value(len, value).into_par_chunk_index(chunk_size)
     }
@@ -151,7 +151,7 @@ impl ParSlice {
         closure: impl FnMut(usize) -> T,
         len: usize,
         chunk_size: usize,
-    ) -> impl UnsafeChunkIndex<T> + ParCollection<Box<[T]>> {
+    ) -> impl UnsafeChunkIndex<T> + ParCollection<[T], Box<[T]>> {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice_with(len, closure).into_par_chunk_index(chunk_size)
     }

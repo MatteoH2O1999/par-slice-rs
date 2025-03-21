@@ -25,7 +25,7 @@ impl PointerParSlice {
     #[inline]
     pub fn new<T: Default + Send + Sync>(
         len: usize,
-    ) -> impl PointerIndex<T> + ParCollection<Box<[T]>> {
+    ) -> impl PointerIndex<T> + ParCollection<T, Box<[T]>> {
         new_boxed_slice(len).into_pointer_par_index()
     }
 
@@ -49,7 +49,7 @@ impl PointerParSlice {
     pub fn with_value<T: Clone + Send + Sync>(
         value: T,
         len: usize,
-    ) -> impl PointerIndex<T> + ParCollection<Box<[T]>> {
+    ) -> impl PointerIndex<T> + ParCollection<T, Box<[T]>> {
         new_boxed_slice_with_value(len, value).into_pointer_par_index()
     }
 
@@ -74,7 +74,7 @@ impl PointerParSlice {
     pub fn with_closure<T: Send + Sync>(
         closure: impl FnMut(usize) -> T,
         len: usize,
-    ) -> impl PointerIndex<T> + ParCollection<Box<[T]>> {
+    ) -> impl PointerIndex<T> + ParCollection<T, Box<[T]>> {
         new_boxed_slice_with(len, closure).into_pointer_par_index()
     }
 
@@ -98,7 +98,7 @@ impl PointerParSlice {
     pub fn new_chunks<T: Default + Send + Sync>(
         len: usize,
         chunk_size: usize,
-    ) -> impl PointerChunkIndex<T> + ParCollection<Box<[T]>> {
+    ) -> impl PointerChunkIndex<T> + ParCollection<[T], Box<[T]>> {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice(len).into_pointer_par_chunk_index(chunk_size)
     }
@@ -124,7 +124,7 @@ impl PointerParSlice {
         value: T,
         len: usize,
         chunk_size: usize,
-    ) -> impl PointerChunkIndex<T> + ParCollection<Box<[T]>> {
+    ) -> impl PointerChunkIndex<T> + ParCollection<[T], Box<[T]>> {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice_with_value(len, value).into_pointer_par_chunk_index(chunk_size)
     }
@@ -151,7 +151,7 @@ impl PointerParSlice {
         closure: impl FnMut(usize) -> T,
         len: usize,
         chunk_size: usize,
-    ) -> impl PointerChunkIndex<T> + ParCollection<Box<[T]>> {
+    ) -> impl PointerChunkIndex<T> + ParCollection<[T], Box<[T]>> {
         assert_chunk_size(len, chunk_size);
         new_boxed_slice_with(len, closure).into_pointer_par_chunk_index(chunk_size)
     }
