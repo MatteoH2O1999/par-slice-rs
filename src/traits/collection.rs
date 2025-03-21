@@ -10,7 +10,7 @@ use std::fmt::Debug;
 /// * The collection must hold a number of elements equal to [`len`](`TrustedSizedCollection::len`).
 /// * [`is_empty`](`TrustedSizedCollection::is_empty`) must return `true` if and only if `len == 0`
 ///   (in other words: `collection.is_empty() == (collection.len() == 0)`).
-pub unsafe trait TrustedSizedCollection<T: ?Sized> {
+pub unsafe trait TrustedSizedCollection {
     /// Returns the number of elements in the collection.
     ///
     /// # Examples
@@ -59,7 +59,7 @@ pub unsafe trait TrustedSizedCollection<T: ?Sized> {
 /// * The collection must hold a number of elements equal to [`num_elements`](`TrustedChunkSizedCollection::num_elements`).
 /// * The number of elements in the collection is equal to the number of chunks in the collection times the chunk size
 ///   (in other words: `num_elements = num_chunks * chunk_size`).
-pub unsafe trait TrustedChunkSizedCollection<T>: TrustedSizedCollection<[T]> {
+pub unsafe trait TrustedChunkSizedCollection: TrustedSizedCollection {
     /// Returns the number of elements in each chunk.
     ///
     /// # Examples
