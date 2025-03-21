@@ -80,7 +80,7 @@ impl<T> UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {
     }
 }
 
-unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedSizedCollection<[T]>
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedSizedCollection
     for UnsafeCellChunkSlice<B>
 {
     #[inline]
@@ -89,7 +89,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedSizedCollection<[T]>
     }
 }
 
-unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedChunkSizedCollection<T>
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedChunkSizedCollection
     for UnsafeCellChunkSlice<B>
 {
     #[inline]

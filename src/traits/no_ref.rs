@@ -130,7 +130,7 @@ use crate::*;
 /// ```
 ///
 /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
-pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection<T> {
+pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection {
     /// Returns a bitwise copy of the element identified by `index` in the collection.
     ///
     /// This method performs bounds checking on `index` to ensure its validity.
@@ -393,7 +393,7 @@ pub unsafe trait UnsafeNoRefIndex<T: ?Sized>: TrustedSizedCollection<T> {
 /// ```
 ///
 /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
-pub unsafe trait UnsafeNoRefChunkIndex<T>: TrustedChunkSizedCollection<T> {
+pub unsafe trait UnsafeNoRefChunkIndex<T>: TrustedChunkSizedCollection {
     /// Sets `out` to a bitwise copy of the chunk of elements identified by `index` in
     /// the collection and returns `out`.
     ///

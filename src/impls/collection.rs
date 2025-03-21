@@ -1,6 +1,6 @@
 use crate::*;
 
-unsafe impl<T> TrustedSizedCollection<T> for Vec<T> {
+unsafe impl<T> TrustedSizedCollection for Vec<T> {
     #[inline]
     fn len(&self) -> usize {
         self.len()
@@ -12,7 +12,7 @@ unsafe impl<T> TrustedSizedCollection<T> for Vec<T> {
     }
 }
 
-unsafe impl<T> TrustedSizedCollection<T> for [T] {
+unsafe impl<T> TrustedSizedCollection for [T] {
     #[inline]
     fn len(&self) -> usize {
         self.len()
@@ -24,7 +24,7 @@ unsafe impl<T> TrustedSizedCollection<T> for [T] {
     }
 }
 
-unsafe impl<T, const N: usize> TrustedSizedCollection<T> for [T; N] {
+unsafe impl<T, const N: usize> TrustedSizedCollection for [T; N] {
     #[inline]
     fn len(&self) -> usize {
         N
@@ -36,19 +36,7 @@ unsafe impl<T, const N: usize> TrustedSizedCollection<T> for [T; N] {
     }
 }
 
-unsafe impl<T, const N: usize> TrustedSizedCollection<[T]> for [[T; N]] {
-    #[inline]
-    fn len(&self) -> usize {
-        self.len()
-    }
-
-    #[inline]
-    fn is_empty(&self) -> bool {
-        self.is_empty()
-    }
-}
-
-unsafe impl<T, const N: usize> TrustedChunkSizedCollection<T> for [[T; N]] {
+unsafe impl<T, const N: usize> TrustedChunkSizedCollection for [[T; N]] {
     #[inline]
     fn chunk_size(&self) -> usize {
         N
@@ -65,19 +53,7 @@ unsafe impl<T, const N: usize> TrustedChunkSizedCollection<T> for [[T; N]] {
     }
 }
 
-unsafe impl<T, const N: usize, const M: usize> TrustedSizedCollection<[T]> for [[T; N]; M] {
-    #[inline]
-    fn len(&self) -> usize {
-        M
-    }
-
-    #[inline]
-    fn is_empty(&self) -> bool {
-        M == 0
-    }
-}
-
-unsafe impl<T, const N: usize, const M: usize> TrustedChunkSizedCollection<T> for [[T; N]; M] {
+unsafe impl<T, const N: usize, const M: usize> TrustedChunkSizedCollection for [[T; N]; M] {
     #[inline]
     fn chunk_size(&self) -> usize {
         N
@@ -85,7 +61,7 @@ unsafe impl<T, const N: usize, const M: usize> TrustedChunkSizedCollection<T> fo
 
     #[inline]
     fn num_chunks(&self) -> usize {
-        M
+        self.len()
     }
 
     #[inline]
