@@ -80,7 +80,7 @@ impl<T> UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {
     }
 }
 
-unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedSizedCollection<[T]>
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedSizedCollection
     for UnsafeCellChunkSlice<B>
 {
     #[inline]
@@ -89,7 +89,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedSizedCollection<[T]>
     }
 }
 
-unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedChunkSizedCollection<T>
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedChunkSizedCollection
     for UnsafeCellChunkSlice<B>
 {
     #[inline]
@@ -140,7 +140,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeNoRefChunkIndex<T>
     for UnsafeCellChunkSlice<B>
 {
     #[inline]
-    unsafe fn get_unchecked<O: AsMut<[T]>>(&self, index: usize, mut out: O) -> O
+    unsafe fn get_values_unchecked<O: AsMut<[T]>>(&self, index: usize, mut out: O) -> O
     where
         T: Copy,
     {
@@ -167,7 +167,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeNoRefChunkIndex<T>
     }
 
     #[inline]
-    unsafe fn set_unchecked(&self, index: usize, value: &[T])
+    unsafe fn set_values_unchecked(&self, index: usize, value: &[T])
     where
         T: Clone,
     {

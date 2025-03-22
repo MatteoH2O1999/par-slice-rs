@@ -131,7 +131,7 @@ use crate::*;
 /// ```
 ///
 /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
-pub unsafe trait UnsafeIndex<T: ?Sized>: TrustedSizedCollection<T> {
+pub unsafe trait UnsafeIndex<T: ?Sized>: TrustedSizedCollection {
     /// Returns a shared reference to the element identified by `index` in the collection.
     ///
     /// This method performs bounds checking on `index` to ensure its validity.
@@ -269,6 +269,6 @@ pub unsafe trait UnsafeIndex<T: ?Sized>: TrustedSizedCollection<T> {
 /// * The collection implements [`UnsafeIndex<[T]>`](`UnsafeIndex`) where `[T]` is a chunk, so `[T].len() == collection.chunk_size()`,
 ///   and where all the methods' indexes refer to the chunk indexes as defined above.
 pub unsafe trait UnsafeChunkIndex<T>:
-    UnsafeIndex<[T]> + TrustedChunkSizedCollection<T>
+    UnsafeIndex<[T]> + TrustedChunkSizedCollection
 {
 }

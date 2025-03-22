@@ -9,9 +9,9 @@ use std::thread::scope;
 fn no_thread_unchecked() {
     let slice = vec![1, 2, 3].into_par_index_no_ref();
 
-    assert_eq!(unsafe { slice.get_unchecked(1) }, 2);
+    assert_eq!(unsafe { slice.get_value_unchecked(1) }, 2);
     unsafe {
-        slice.set_unchecked(2, 42);
+        slice.set_value_unchecked(2, 42);
     }
 
     assert_eq!(slice.into(), vec![1, 2, 42]);
@@ -21,9 +21,9 @@ fn no_thread_unchecked() {
 fn no_thread_checked() {
     let slice = vec![1, 2, 3].into_par_index_no_ref();
 
-    assert_eq!(unsafe { slice.get(1) }, 2);
+    assert_eq!(unsafe { slice.get_value(1) }, 2);
     unsafe {
-        slice.set(2, 42);
+        slice.set_value(2, 42);
     }
 
     assert_eq!(slice.into(), vec![1, 2, 42]);
@@ -35,7 +35,7 @@ fn no_thread_checked_panic_get() {
     let slice = vec![1, 2, 3].into_par_index_no_ref();
 
     unsafe {
-        slice.get(42);
+        slice.get_value(42);
     }
 }
 
@@ -45,7 +45,7 @@ fn no_thread_checked_panic_set() {
     let slice = vec![1, 2, 3].into_par_index_no_ref();
 
     unsafe {
-        slice.set(69, 42);
+        slice.set_value(69, 42);
     }
 }
 
@@ -59,12 +59,12 @@ fn single_thread_unchecked() {
 
     scope(|s| {
         s.spawn(|| {
-            assert_eq!(unsafe { slice.get_unchecked(1) }, 2);
+            assert_eq!(unsafe { slice.get_value_unchecked(1) }, 2);
         })
         .join()
         .unwrap();
         s.spawn(|| {
-            unsafe { slice.set_unchecked(2, 42) };
+            unsafe { slice.set_value_unchecked(2, 42) };
         })
         .join()
         .unwrap();
@@ -79,12 +79,12 @@ fn single_thread_checked() {
 
     scope(|s| {
         s.spawn(|| {
-            assert_eq!(unsafe { slice.get(1) }, 2);
+            assert_eq!(unsafe { slice.get_value(1) }, 2);
         })
         .join()
         .unwrap();
         s.spawn(|| {
-            unsafe { slice.set(2, 42) };
+            unsafe { slice.set_value(2, 42) };
         })
         .join()
         .unwrap();
@@ -99,12 +99,12 @@ fn single_thread_checked_panic_get() {
 
     scope(|s| {
         s.spawn(|| {
-            unsafe { slice.get(42) };
+            unsafe { slice.get_value(42) };
         })
         .join()
         .unwrap_err();
         s.spawn(|| {
-            unsafe { slice.set(2, 42) };
+            unsafe { slice.set_value(2, 42) };
         })
         .join()
         .unwrap();
@@ -119,12 +119,12 @@ fn single_thread_checked_panic_set() {
 
     scope(|s| {
         s.spawn(|| {
-            assert_eq!(unsafe { slice.get(1) }, 2);
+            assert_eq!(unsafe { slice.get_value(1) }, 2);
         })
         .join()
         .unwrap();
         s.spawn(|| {
-            unsafe { slice.set(69, 42) };
+            unsafe { slice.set_value(69, 42) };
         })
         .join()
         .unwrap_err();
@@ -143,10 +143,10 @@ fn multithread_unchecked() {
 
     scope(|s| {
         s.spawn(|| {
-            assert_eq!(unsafe { slice.get_unchecked(1) }, 2);
+            assert_eq!(unsafe { slice.get_value_unchecked(1) }, 2);
         });
         s.spawn(|| {
-            unsafe { slice.set_unchecked(2, 42) };
+            unsafe { slice.set_value_unchecked(2, 42) };
         });
     });
 
@@ -159,10 +159,10 @@ fn multithread_checked() {
 
     scope(|s| {
         s.spawn(|| {
-            assert_eq!(unsafe { slice.get(1) }, 2);
+            assert_eq!(unsafe { slice.get_value(1) }, 2);
         });
         s.spawn(|| {
-            unsafe { slice.set(2, 42) };
+            unsafe { slice.set_value(2, 42) };
         });
     });
 
@@ -175,10 +175,10 @@ fn multithread_checked_panic_get() {
 
     scope(|s| {
         s.spawn(|| {
-            unsafe { slice.set(2, 42) };
+            unsafe { slice.set_value(2, 42) };
         });
         s.spawn(|| {
-            unsafe { slice.get(42) };
+            unsafe { slice.get_value(42) };
         })
         .join()
         .unwrap_err();
@@ -193,10 +193,10 @@ fn multithread_checked_panic_mut() {
 
     scope(|s| {
         s.spawn(|| {
-            assert_eq!(unsafe { slice.get(1) }, 2);
+            assert_eq!(unsafe { slice.get_value(1) }, 2);
         });
         s.spawn(|| {
-            unsafe { slice.set(69, 42) };
+            unsafe { slice.set_value(69, 42) };
         })
         .join()
         .unwrap_err();

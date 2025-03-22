@@ -69,7 +69,7 @@ use crate::*;
 ///     // Let's use setters and getters to chunks of size 2
 ///     let view = collection.as_par_chunk_index_no_ref(2);
 ///     unsafe {
-///         view.set(1, &[69, 69]);
+///         view.set_values(1, &[69, 69]);
 ///     }
 /// }
 ///
@@ -113,7 +113,7 @@ pub unsafe trait ParIndexView<T> {
     ///
     /// assert_eq!(collection, vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);
     /// ```
-    fn as_pointer_par_index(&mut self) -> impl PointerIndex<T> + ParView;
+    fn as_pointer_par_index(&mut self) -> impl PointerIndex<T> + ParView<T>;
 
     /// Returns a view of the collection that allows unsynchronized access to its
     /// elements through setters and getters.
@@ -127,15 +127,15 @@ pub unsafe trait ParIndexView<T> {
     /// {
     ///     let view = collection.as_par_index_no_ref();
     ///     unsafe {
-    ///         view.set(1, 42);
-    ///         view.set(5, 69);
-    ///         assert_eq!(view.get(2), 2);
+    ///         view.set_value(1, 42);
+    ///         view.set_value(5, 69);
+    ///         assert_eq!(view.get_value(2), 2);
     ///     }
     /// }
     ///
     /// assert_eq!(collection, vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);
     /// ```
-    fn as_par_index_no_ref(&mut self) -> impl UnsafeNoRefIndex<T> + ParView;
+    fn as_par_index_no_ref(&mut self) -> impl UnsafeNoRefIndex<T> + ParView<T>;
 
     /// Returns a view of the collection that allows unsynchronized access to its
     /// elements through references.
@@ -158,7 +158,7 @@ pub unsafe trait ParIndexView<T> {
     ///
     /// assert_eq!(collection, vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);
     /// ```
-    fn as_par_index(&mut self) -> impl UnsafeIndex<T> + ParView;
+    fn as_par_index(&mut self) -> impl UnsafeIndex<T> + ParView<T>;
 
     /// Returns a view of the collection that allows unsynchronized access to
     /// chunks of `chunk_size` of its elements through pointers.
@@ -189,7 +189,7 @@ pub unsafe trait ParIndexView<T> {
     fn as_pointer_par_chunk_index(
         &mut self,
         chunk_size: usize,
-    ) -> impl PointerChunkIndex<T> + ParView;
+    ) -> impl PointerChunkIndex<T> + ParView<[T]>;
 
     /// Returns a view of the collection that allows unsynchronized access to
     /// chunks of `chunk_size` of its elements through setters and getters.
@@ -207,9 +207,9 @@ pub unsafe trait ParIndexView<T> {
     /// {
     ///     let view = collection.as_par_chunk_index_no_ref(5);
     ///     unsafe {
-    ///         view.set(0, &[0, 42, 2, 3, 4]);
-    ///         view.set(1, &[69, 6, 7, 8, 9]);
-    ///         assert_eq!(view.get(1, vec![0; 5]), vec![69, 6, 7, 8, 9]);
+    ///         view.set_values(0, &[0, 42, 2, 3, 4]);
+    ///         view.set_values(1, &[69, 6, 7, 8, 9]);
+    ///         assert_eq!(view.get_values(1, vec![0; 5]), vec![69, 6, 7, 8, 9]);
     ///     }
     /// }
     ///
@@ -218,7 +218,7 @@ pub unsafe trait ParIndexView<T> {
     fn as_par_chunk_index_no_ref(
         &mut self,
         chunk_size: usize,
-    ) -> impl UnsafeNoRefChunkIndex<T> + ParView;
+    ) -> impl UnsafeNoRefChunkIndex<T> + ParView<[T]>;
 
     /// Returns a view of the collection that allows unsynchronized access to
     /// chunks of `chunk_size` of its elements through references.
@@ -244,7 +244,7 @@ pub unsafe trait ParIndexView<T> {
     ///
     /// assert_eq!(collection, vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);
     /// ```
-    fn as_par_chunk_index(&mut self, chunk_size: usize) -> impl UnsafeChunkIndex<T> + ParView;
+    fn as_par_chunk_index(&mut self, chunk_size: usize) -> impl UnsafeChunkIndex<T> + ParView<[T]>;
 }
 
 /// A value-to-value conversion that consumes the input collection and produces one
@@ -319,7 +319,7 @@ pub unsafe trait ParIndexView<T> {
 /// let par_collection = collection.into_par_chunk_index_no_ref(2);
 ///
 /// unsafe {
-///     par_collection.set(1, &[69, 69]);
+///     par_collection.set_values(1, &[69, 69]);
 /// }
 ///
 /// collection = par_collection.into();
@@ -360,7 +360,7 @@ pub unsafe trait IntoParIndex<T>: Sized {
     ///
     /// assert_eq!(collection.into(), vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);
     /// ```
-    fn into_pointer_par_index(self) -> impl PointerIndex<T> + ParCollection<Self>;
+    fn into_pointer_par_index(self) -> impl PointerIndex<T> + ParCollection<T, Self>;
 
     /// Converts the collection into one that allows unsynchronized access to its
     /// elements through setters and getters.
@@ -372,14 +372,14 @@ pub unsafe trait IntoParIndex<T>: Sized {
     /// let collection = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9].into_par_index_no_ref();
     ///
     /// unsafe {
-    ///     collection.set(1, 42);
-    ///     collection.set(5, 69);
-    ///     assert_eq!(collection.get(2), 2);
+    ///     collection.set_value(1, 42);
+    ///     collection.set_value(5, 69);
+    ///     assert_eq!(collection.get_value(2), 2);
     /// }
     ///
     /// assert_eq!(collection.into(), vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);
     /// ```
-    fn into_par_index_no_ref(self) -> impl UnsafeNoRefIndex<T> + ParCollection<Self>;
+    fn into_par_index_no_ref(self) -> impl UnsafeNoRefIndex<T> + ParCollection<T, Self>;
 
     /// Converts the collection into one that allows unsynchronized access to its
     /// elements through references.
@@ -399,7 +399,7 @@ pub unsafe trait IntoParIndex<T>: Sized {
     ///
     /// assert_eq!(collection.into(), vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);
     /// ```
-    fn into_par_index(self) -> impl UnsafeIndex<T> + ParCollection<Self>;
+    fn into_par_index(self) -> impl UnsafeIndex<T> + ParCollection<T, Self>;
 
     /// Converts the collection into one that allows unsynchronized access to
     /// chunks of `chunk_size` of its elements through pointers.
@@ -427,7 +427,7 @@ pub unsafe trait IntoParIndex<T>: Sized {
     fn into_pointer_par_chunk_index(
         self,
         chunk_size: usize,
-    ) -> impl PointerChunkIndex<T> + ParCollection<Self>;
+    ) -> impl PointerChunkIndex<T> + ParCollection<[T], Self>;
 
     /// Converts the collection into one that allows unsynchronized access to
     /// chunks of `chunk_size` of its elements through setters and getters.
@@ -443,9 +443,9 @@ pub unsafe trait IntoParIndex<T>: Sized {
     /// let collection = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9].into_par_chunk_index_no_ref(5);
     ///
     /// unsafe {
-    ///     collection.set(0, &[0, 42, 2, 3, 4]);
-    ///     collection.set(1, &[69, 6, 7, 8, 9]);
-    ///     assert_eq!(collection.get(1, vec![0; 5]).as_ref(), vec![69, 6, 7, 8, 9]);
+    ///     collection.set_values(0, &[0, 42, 2, 3, 4]);
+    ///     collection.set_values(1, &[69, 6, 7, 8, 9]);
+    ///     assert_eq!(collection.get_values(1, vec![0; 5]).as_ref(), vec![69, 6, 7, 8, 9]);
     /// }
     ///
     /// assert_eq!(collection.into(), vec![0, 42, 2, 3, 4, 69, 6, 7, 8, 9]);
@@ -453,7 +453,7 @@ pub unsafe trait IntoParIndex<T>: Sized {
     fn into_par_chunk_index_no_ref(
         self,
         chunk_size: usize,
-    ) -> impl UnsafeNoRefChunkIndex<T> + ParCollection<Self>;
+    ) -> impl UnsafeNoRefChunkIndex<T> + ParCollection<[T], Self>;
 
     /// Converts the collection into one that allows unsynchronized access to
     /// chunks of `chunk_size` of its elements through references.
@@ -479,5 +479,5 @@ pub unsafe trait IntoParIndex<T>: Sized {
     fn into_par_chunk_index(
         self,
         chunk_size: usize,
-    ) -> impl UnsafeChunkIndex<T> + ParCollection<Self>;
+    ) -> impl UnsafeChunkIndex<T> + ParCollection<[T], Self>;
 }

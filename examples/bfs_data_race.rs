@@ -88,7 +88,7 @@ pub fn main() {
                                     // Safety: each node is accessed exactly once because of
                                     // AtomicBool::swap so no data races can happen
                                     // and node is always < dists.len() by construction
-                                    dists.set_unchecked(node, current_dist)
+                                    dists.set_value_unchecked(node, current_dist)
                                 }
 
                                 for &succ in tree.successors(node) {

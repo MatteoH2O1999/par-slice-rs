@@ -10,7 +10,7 @@ use std::fmt::Debug;
 /// * The collection must hold a number of elements equal to [`len`](`TrustedSizedCollection::len`).
 /// * [`is_empty`](`TrustedSizedCollection::is_empty`) must return `true` if and only if `len == 0`
 ///   (in other words: `collection.is_empty() == (collection.len() == 0)`).
-pub unsafe trait TrustedSizedCollection<T: ?Sized> {
+pub unsafe trait TrustedSizedCollection {
     /// Returns the number of elements in the collection.
     ///
     /// # Examples
@@ -59,7 +59,7 @@ pub unsafe trait TrustedSizedCollection<T: ?Sized> {
 /// * The collection must hold a number of elements equal to [`num_elements`](`TrustedChunkSizedCollection::num_elements`).
 /// * The number of elements in the collection is equal to the number of chunks in the collection times the chunk size
 ///   (in other words: `num_elements = num_chunks * chunk_size`).
-pub unsafe trait TrustedChunkSizedCollection<T>: TrustedSizedCollection<[T]> {
+pub unsafe trait TrustedChunkSizedCollection: TrustedSizedCollection {
     /// Returns the number of elements in each chunk.
     ///
     /// # Examples
@@ -104,16 +104,18 @@ pub unsafe trait TrustedChunkSizedCollection<T>: TrustedSizedCollection<[T]> {
 }
 
 /// Traits common to parallel views on collections.
-pub trait ParView: Send + Sync + Debug {}
+///
+/// `T` is the type of the collection's elements.
+pub trait ParView<T: ?Sized>: Send + Sync + Debug {}
 
-impl<T: Send + Sync + Debug> ParView for T {}
+impl<T: ?Sized, G: Send + Sync + Debug> ParView<T> for G {}
 
 /// Traits common to parallel collections.
 ///
-/// `C` is the wrapped collection.
-pub trait ParCollection<C>: Into<C> + ParView {}
+/// `T` is the type of the collection's elements, `C` is the wrapped collection.
+pub trait ParCollection<T: ?Sized, C>: ParView<T> + Into<C> {}
 
-impl<C, T: Into<C> + ParView> ParCollection<C> for T {}
+impl<T: ?Sized, C, G: Into<C> + ParView<T>> ParCollection<T, C> for G {}
 
 /// Asserts that `index` is between `0` and `len - 1`, panicking otherwise.
 #[inline]

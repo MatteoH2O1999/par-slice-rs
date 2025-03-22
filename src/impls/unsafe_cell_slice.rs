@@ -52,9 +52,7 @@ impl<T> UnsafeCellSlice<Box<UnsafeCell<[T]>>> {
     }
 }
 
-unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedSizedCollection<T>
-    for UnsafeCellSlice<B>
-{
+unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> TrustedSizedCollection for UnsafeCellSlice<B> {
     #[inline]
     fn len(&self) -> usize {
         self.0.get().len()
@@ -82,7 +80,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerIndex<T> for UnsafeCel
 
 unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeNoRefIndex<T> for UnsafeCellSlice<B> {
     #[inline]
-    unsafe fn get_unchecked(&self, index: usize) -> T
+    unsafe fn get_value_unchecked(&self, index: usize) -> T
     where
         T: Copy,
     {
@@ -94,7 +92,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> UnsafeNoRefIndex<T> for Unsaf
     }
 
     #[inline]
-    unsafe fn set_unchecked(&self, index: usize, value: T)
+    unsafe fn set_value_unchecked(&self, index: usize, value: T)
     where
         T: Sized,
     {

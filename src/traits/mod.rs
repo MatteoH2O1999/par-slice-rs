@@ -4,6 +4,9 @@ pub use conversion::*;
 mod collection;
 pub use collection::*;
 
+mod indexing;
+pub use indexing::*;
+
 mod no_ref;
 pub use no_ref::*;
 
