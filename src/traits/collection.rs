@@ -120,12 +120,7 @@ impl<T: ?Sized, C, G: Into<C> + ParView<T>> ParCollection<T, C> for G {}
 /// Asserts that `index` is between `0` and `len - 1`, panicking otherwise.
 #[inline]
 pub(crate) fn assert_in_bounds(len: usize, index: usize) {
-    assert!(
-        index < len,
-        "Index {} invalid for slice of len {}",
-        index,
-        len
-    )
+    assert!(index < len, "Index {index} invalid for slice of len {len}")
 }
 
 /// Asserts that `chunk.len()` is equal to `chunk_size`, panicking otherwise
