@@ -7,7 +7,13 @@ macro_rules! wrapper_method_doc {
             stringify!($method),
             "`](`",
             stringify!($method),
-            "`)`(index.`[`as_usize`](`AsUsize::as_usize`)`())`."
+            "`)`(index.`[`as_usize`](`AsUsize::as_usize`)`())`.",
+            "\n# Safety\n",
+            "See [`",
+            stringify!($method),
+            "`](`",
+            stringify!($method),
+            "`)'s safety section."
         )
     };
     ($method:path,$other_params:literal) => {
@@ -18,7 +24,13 @@ macro_rules! wrapper_method_doc {
             stringify!($method),
             "`)`(index.`[`as_usize`](`AsUsize::as_usize`)`()",
             $other_params,
-            ")`."
+            ")`.",
+            "\n# Safety\n",
+            "See [`",
+            stringify!($method),
+            "`](`",
+            stringify!($method),
+            "`)'s safety section."
         )
     };
 }
