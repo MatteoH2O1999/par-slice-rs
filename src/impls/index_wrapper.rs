@@ -160,3 +160,31 @@ impl<I: AsUsize, T, B: UnsafeNoRefChunkIndex<T>> IndexWrapper<I, T, B> {
         }
     }
 }
+
+impl<I: AsUsize, T: ?Sized, B: UnsafeIndex<T>> IndexWrapper<I, T, B> {
+    #[doc = wrapper_method_doc!(UnsafeIndex::get)]
+    #[inline]
+    pub unsafe fn get(&self, index: I) -> &T {
+        unsafe { self.backend.get(index.as_usize()) }
+    }
+
+    #[doc = wrapper_method_doc!(UnsafeIndex::get_unchecked)]
+    #[inline]
+    pub unsafe fn get_unchecked(&self, index: I) -> &T {
+        unsafe { self.backend.get_unchecked(index.as_usize()) }
+    }
+
+    #[doc = wrapper_method_doc!(UnsafeIndex::get_mut)]
+    #[allow(clippy::mut_from_ref)]
+    #[inline]
+    pub unsafe fn get_mut(&self, index: I) -> &mut T {
+        unsafe { self.backend.get_mut(index.as_usize()) }
+    }
+
+    #[doc = wrapper_method_doc!(UnsafeIndex::get_mut_unchecked)]
+    #[allow(clippy::mut_from_ref)]
+    #[inline]
+    pub unsafe fn get_mut_unchecked(&self, index: I) -> &mut T {
+        unsafe { self.backend.get_mut_unchecked(index.as_usize()) }
+    }
+}
