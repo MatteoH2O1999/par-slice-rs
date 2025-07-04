@@ -41,6 +41,14 @@ pub struct IndexWrapper<I, T: ?Sized, B> {
 }
 
 impl<T: ?Sized, B: ParView<T>> IndexWrapper<(), T, B> {
+    /// Wraps the given collection into a `IndexWrapper` that accepts indices of type `I`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use par_slice::*;
+    /// let wrapped_vector = IndexWrapper::new::<u8>(vec![0, 1, 2].into_par_index());
+    /// ```
     #[inline]
     pub fn new<I: AsUsize>(collection: B) -> IndexWrapper<I, T, B> {
         IndexWrapper {
@@ -51,6 +59,16 @@ impl<T: ?Sized, B: ParView<T>> IndexWrapper<(), T, B> {
 }
 
 impl<I, T, B> IndexWrapper<I, T, B> {
+    /// Consumes the `IndexWrapper`, returning the wrapped collection.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use par_slice::*;
+    /// let wrapped_vector = IndexWrapper::new::<usize>(vec![0, 1, 2].into_par_index());
+    ///
+    /// assert_eq!(wrapped_vector.into_inner().into(), vec![0, 1, 2]);
+    /// ```
     #[inline]
     pub fn into_inner(self) -> B {
         self.backend
