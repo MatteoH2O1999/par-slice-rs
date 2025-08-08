@@ -35,6 +35,11 @@ macro_rules! wrapper_method_doc {
     };
 }
 
+/// A wrapper on a collection that allows access to its elements through
+/// non-[`usize`] indices.
+///
+/// It implements wrappers around all methods from traits [`PointerIndex`],
+/// [`UnsafeNoRefIndex`], [`UnsafeNoRefChunkIndex`] and [`UnsafeIndex`].
 pub struct IndexWrapper<I, T: ?Sized, B> {
     backend: B,
     _marker: std::marker::PhantomData<(I, T)>,
