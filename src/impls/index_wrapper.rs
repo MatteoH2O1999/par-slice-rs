@@ -211,3 +211,104 @@ impl<I: AsUsize, T: ?Sized, B: UnsafeIndex<T>> IndexWrapper<I, T, B> {
         unsafe { self.inner.get_mut_unchecked(index.as_usize()) }
     }
 }
+
+// Safety for following trait implementations: this is only a wrapper.
+unsafe impl<I, T: ?Sized, B: TrustedSizedCollection> TrustedSizedCollection
+    for IndexWrapper<I, T, B>
+{
+    #[inline]
+    fn len(&self) -> usize {
+        self.inner.len()
+    }
+
+    fn is_empty(&self) -> bool {
+        self.inner.is_empty()
+    }
+}
+
+unsafe impl<I, T: ?Sized, B: TrustedChunkSizedCollection> TrustedChunkSizedCollection
+    for IndexWrapper<I, T, B>
+{
+    #[inline]
+    fn chunk_size(&self) -> usize {
+        self.inner.chunk_size()
+    }
+
+    #[inline]
+    fn num_chunks(&self) -> usize {
+        self.inner.num_chunks()
+    }
+
+    #[inline]
+    fn num_elements(&self) -> usize {
+        self.inner.num_elements()
+    }
+}
+
+unsafe impl<I, T: ?Sized, B: PointerIndex<T>> PointerIndex<T> for IndexWrapper<I, T, B> {
+    #[inline]
+    unsafe fn get_ptr_unchecked(&self, index: usize) -> *const T {
+        unsafe { self.inner.get_ptr_unchecked(index) }
+    }
+
+    #[inline]
+    unsafe fn get_mut_ptr_unchecked(&self, index: usize) -> *mut T {
+        unsafe { self.inner.get_mut_ptr_unchecked(index) }
+    }
+}
+
+unsafe impl<I, T, B: PointerChunkIndex<T>> PointerChunkIndex<T> for IndexWrapper<I, [T], B> {}
+
+unsafe impl<I, T: ?Sized, B: UnsafeNoRefIndex<T>> UnsafeNoRefIndex<T> for IndexWrapper<I, T, B> {
+    #[inline]
+    unsafe fn get_value_unchecked(&self, index: usize) -> T
+    where
+        T: Copy,
+    {
+        unsafe { self.inner.get_value_unchecked(index) }
+    }
+
+    #[inline]
+    unsafe fn set_value_unchecked(&self, index: usize, value: T)
+    where
+        T: Sized,
+    {
+        unsafe {
+            self.inner.set_value_unchecked(index, value);
+        }
+    }
+}
+
+unsafe impl<I, T, B: UnsafeNoRefChunkIndex<T>> UnsafeNoRefChunkIndex<T> for IndexWrapper<I, T, B> {
+    #[inline]
+    unsafe fn get_values_unchecked<O: AsMut<[T]>>(&self, index: usize, out: O) -> O
+    where
+        T: Copy,
+    {
+        unsafe { self.inner.get_values_unchecked(index, out) }
+    }
+
+    #[inline]
+    unsafe fn set_values_unchecked(&self, index: usize, values: &[T])
+    where
+        T: Clone,
+    {
+        unsafe {
+            self.inner.set_values_unchecked(index, values);
+        }
+    }
+}
+
+unsafe impl<I, T: ?Sized, B: UnsafeIndex<T>> UnsafeIndex<T> for IndexWrapper<I, T, B> {
+    #[inline]
+    unsafe fn get_unchecked(&self, index: usize) -> &T {
+        unsafe { self.inner.get_unchecked(index) }
+    }
+
+    #[inline]
+    unsafe fn get_mut_unchecked(&self, index: usize) -> &mut T {
+        unsafe { self.inner.get_mut_unchecked(index) }
+    }
+}
+
+unsafe impl<I, T, B: UnsafeChunkIndex<T>> UnsafeChunkIndex<T> for IndexWrapper<I, [T], B> {}
