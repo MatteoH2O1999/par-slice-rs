@@ -7,7 +7,7 @@ macro_rules! wrapper_method_doc {
             stringify!($method),
             "`](`",
             stringify!($method),
-            "`)`(index.`[`as_usize`](`AsUsize::as_usize`)`())`.",
+            "`)`(&self, index.`[`as_usize`](`AsUsize::as_usize`)`())`.",
             "\n# Safety\n",
             "See [`",
             stringify!($method),
@@ -22,7 +22,7 @@ macro_rules! wrapper_method_doc {
             stringify!($method),
             "`](`",
             stringify!($method),
-            "`)`(index.`[`as_usize`](`AsUsize::as_usize`)`()",
+            "`)`(&self, index.`[`as_usize`](`AsUsize::as_usize`)`()",
             $other_params,
             ")`.",
             "\n# Safety\n",
@@ -41,7 +41,7 @@ macro_rules! wrapper_method_doc {
 /// It implements wrappers around all methods from traits [`PointerIndex`],
 /// [`UnsafeNoRefIndex`], [`UnsafeNoRefChunkIndex`] and [`UnsafeIndex`].
 pub struct IndexWrapper<I, T: ?Sized, B> {
-    backend: B,
+    inner: B,
     _marker: std::marker::PhantomData<(I, T)>,
 }
 
@@ -57,7 +57,7 @@ impl<T: ?Sized, B: ParView<T>> IndexWrapper<(), T, B> {
     #[inline]
     pub fn new<I: AsUsize>(collection: B) -> IndexWrapper<I, T, B> {
         IndexWrapper {
-            backend: collection,
+            inner: collection,
             _marker: std::marker::PhantomData,
         }
     }
@@ -76,7 +76,7 @@ impl<I, T, B> IndexWrapper<I, T, B> {
     /// ```
     #[inline]
     pub fn into_inner(self) -> B {
-        self.backend
+        self.inner
     }
 }
 
@@ -84,25 +84,25 @@ impl<I: AsUsize, T: ?Sized, B: PointerIndex<T>> IndexWrapper<I, T, B> {
     #[doc = wrapper_method_doc!(PointerIndex::get_ptr)]
     #[inline]
     pub fn get_ptr(&self, index: I) -> *const T {
-        self.backend.get_ptr(index.as_usize())
+        self.inner.get_ptr(index.as_usize())
     }
 
     #[doc = wrapper_method_doc!(PointerIndex::get_ptr_unchecked)]
     #[inline]
     pub unsafe fn get_ptr_unchecked(&self, index: I) -> *const T {
-        unsafe { self.backend.get_ptr_unchecked(index.as_usize()) }
+        unsafe { self.inner.get_ptr_unchecked(index.as_usize()) }
     }
 
     #[doc = wrapper_method_doc!(PointerIndex::get_mut_ptr)]
     #[inline]
     pub fn get_mut_ptr(&self, index: I) -> *mut T {
-        self.backend.get_mut_ptr(index.as_usize())
+        self.inner.get_mut_ptr(index.as_usize())
     }
 
     #[doc = wrapper_method_doc!(PointerIndex::get_mut_ptr_unchecked)]
     #[inline]
     pub unsafe fn get_mut_ptr_unchecked(&self, index: I) -> *mut T {
-        unsafe { self.backend.get_mut_ptr_unchecked(index.as_usize()) }
+        unsafe { self.inner.get_mut_ptr_unchecked(index.as_usize()) }
     }
 }
 
@@ -113,7 +113,7 @@ impl<I: AsUsize, T, B: UnsafeNoRefIndex<T>> IndexWrapper<I, T, B> {
     where
         T: Copy,
     {
-        unsafe { self.backend.get_value(index.as_usize()) }
+        unsafe { self.inner.get_value(index.as_usize()) }
     }
 
     #[doc = wrapper_method_doc!(UnsafeNoRefIndex::get_value_unchecked)]
@@ -122,14 +122,14 @@ impl<I: AsUsize, T, B: UnsafeNoRefIndex<T>> IndexWrapper<I, T, B> {
     where
         T: Copy,
     {
-        unsafe { self.backend.get_value_unchecked(index.as_usize()) }
+        unsafe { self.inner.get_value_unchecked(index.as_usize()) }
     }
 
     #[doc = wrapper_method_doc!(UnsafeNoRefIndex::set_value, ", value")]
     #[inline]
     pub unsafe fn set_value(&self, index: I, value: T) {
         unsafe {
-            self.backend.set_value(index.as_usize(), value);
+            self.inner.set_value(index.as_usize(), value);
         }
     }
 
@@ -137,7 +137,7 @@ impl<I: AsUsize, T, B: UnsafeNoRefIndex<T>> IndexWrapper<I, T, B> {
     #[inline]
     pub unsafe fn set_value_unchecked(&self, index: I, value: T) {
         unsafe {
-            self.backend.set_value_unchecked(index.as_usize(), value);
+            self.inner.set_value_unchecked(index.as_usize(), value);
         }
     }
 }
@@ -149,7 +149,7 @@ impl<I: AsUsize, T, B: UnsafeNoRefChunkIndex<T>> IndexWrapper<I, T, B> {
     where
         T: Copy,
     {
-        unsafe { self.backend.get_values(index.as_usize(), out) }
+        unsafe { self.inner.get_values(index.as_usize(), out) }
     }
 
     #[doc = wrapper_method_doc!(UnsafeNoRefChunkIndex::get_values_unchecked, ", out")]
@@ -158,7 +158,7 @@ impl<I: AsUsize, T, B: UnsafeNoRefChunkIndex<T>> IndexWrapper<I, T, B> {
     where
         T: Copy,
     {
-        unsafe { self.backend.get_values_unchecked(index.as_usize(), out) }
+        unsafe { self.inner.get_values_unchecked(index.as_usize(), out) }
     }
 
     #[doc = wrapper_method_doc!(UnsafeNoRefChunkIndex::set_values, ", values")]
@@ -168,7 +168,7 @@ impl<I: AsUsize, T, B: UnsafeNoRefChunkIndex<T>> IndexWrapper<I, T, B> {
         T: Clone,
     {
         unsafe {
-            self.backend.set_values(index.as_usize(), values);
+            self.inner.set_values(index.as_usize(), values);
         }
     }
 
@@ -179,7 +179,7 @@ impl<I: AsUsize, T, B: UnsafeNoRefChunkIndex<T>> IndexWrapper<I, T, B> {
         T: Clone,
     {
         unsafe {
-            self.backend.set_values_unchecked(index.as_usize(), values);
+            self.inner.set_values_unchecked(index.as_usize(), values);
         }
     }
 }
@@ -188,26 +188,26 @@ impl<I: AsUsize, T: ?Sized, B: UnsafeIndex<T>> IndexWrapper<I, T, B> {
     #[doc = wrapper_method_doc!(UnsafeIndex::get)]
     #[inline]
     pub unsafe fn get(&self, index: I) -> &T {
-        unsafe { self.backend.get(index.as_usize()) }
+        unsafe { self.inner.get(index.as_usize()) }
     }
 
     #[doc = wrapper_method_doc!(UnsafeIndex::get_unchecked)]
     #[inline]
     pub unsafe fn get_unchecked(&self, index: I) -> &T {
-        unsafe { self.backend.get_unchecked(index.as_usize()) }
+        unsafe { self.inner.get_unchecked(index.as_usize()) }
     }
 
     #[doc = wrapper_method_doc!(UnsafeIndex::get_mut)]
     #[allow(clippy::mut_from_ref)]
     #[inline]
     pub unsafe fn get_mut(&self, index: I) -> &mut T {
-        unsafe { self.backend.get_mut(index.as_usize()) }
+        unsafe { self.inner.get_mut(index.as_usize()) }
     }
 
     #[doc = wrapper_method_doc!(UnsafeIndex::get_mut_unchecked)]
     #[allow(clippy::mut_from_ref)]
     #[inline]
     pub unsafe fn get_mut_unchecked(&self, index: I) -> &mut T {
-        unsafe { self.backend.get_mut_unchecked(index.as_usize()) }
+        unsafe { self.inner.get_mut_unchecked(index.as_usize()) }
     }
 }
