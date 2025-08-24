@@ -1,3 +1,5 @@
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+
 //! ParSlice is a utility crate to allow easier access to data in parallel
 //! when data races are avoided at compile time or through other means but the
 //! compiler has no way to know.

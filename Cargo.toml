@@ -10,6 +10,13 @@ keywords = ["slice", "index", "parallel", "access", "concurrent"]
 categories = ["concurrency"]
 rust-version = "1.84"
 
+[package.metadata.docs.rs]
+all-features = true
+
+[features]
+alloc = []
+default = [ "alloc" ]
+
 [[example]]
 name = "bfs_pointer"
 test = true
