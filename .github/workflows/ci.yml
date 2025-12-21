@@ -76,6 +76,7 @@ jobs:
           channel: stable
           profile: minimal
           subcommands: cargo-all-features
+          cache: binstall
       - name: Test build
         run: cargo all-features build --release
       - name: Build tests
@@ -103,6 +104,7 @@ jobs:
           profile: minimal
           components: miri
           subcommands: cargo-all-features
+          cache: binstall
       - name: Build tests
         run: |
           cargo miri setup
@@ -124,10 +126,8 @@ jobs:
         with:
           channel: stable
           profile: minimal
-      - name: Install cargo-quickinstall
-        run: cargo install cargo-quickinstall
-      - name: Install cargo-semver-checks and cargo-msrv
-        run: cargo quickinstall cargo-semver-checks cargo-msrv
+          subcommands: cargo-semver-checks cargo-msrv
+          cache: binstall
       - name: Check semver compatibility
         run: cargo semver-checks --all-features
       - name: Check minimum Rust version
