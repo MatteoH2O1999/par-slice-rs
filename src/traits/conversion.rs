@@ -294,8 +294,8 @@ pub unsafe trait ParIndexView<T> {
 ///   chunk 1 includes indices from 4 to 7, etc.).
 /// * All returned collections must implement [`Into`] to convert back to the original collection
 ///   type. The input collection's original internal state beside size is not guaranteed to be preserved
-///   (*i.e.* a [`Vec`] can possess a different [`capacity`](Vec::capacity) when converted back, but
-///   the [`len`](`Vec::len`) must be the same, as well as the indexes of its elements).
+///   (*i.e.* a [`Vec`](alloc::vec::Vec) can possess a different [`capacity`](alloc::vec::Vec::capacity) when converted back, but
+///   the [`len`](`alloc::vec::Vec::len`) must be the same, as well as the indexes of its elements).
 ///
 /// # Examples
 ///
