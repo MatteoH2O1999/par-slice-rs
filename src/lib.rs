@@ -265,6 +265,13 @@
 //! }
 //! ```
 //!
+//! # no_std
+//!
+//! This crate is `no_std` compatible.
+//!
+//! By default the `alloc` feature is enabled and allows to use heap-allocated structures,
+//! but requires the `alloc` crate.
+//!
 //! [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
 mod impls;
 pub use impls::*;
