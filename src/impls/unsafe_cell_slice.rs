@@ -1,5 +1,7 @@
 use crate::*;
-use std::{cell::UnsafeCell, mem::size_of, ops::Deref};
+#[cfg(feature = "alloc")]
+use alloc::{boxed::Box, vec::Vec};
+use core::{cell::UnsafeCell, mem::size_of, ops::Deref};
 
 /// Wrapper around an [`UnsafeCell`] (either mutable reference or owned).
 #[derive(Debug)]
@@ -8,8 +10,10 @@ pub(crate) struct UnsafeCellSlice<B>(B);
 // Safety: access paradigms shift responsability to the user to ensure
 // no data races happen.
 unsafe impl<T: Send + Sync> Sync for UnsafeCellSlice<&mut UnsafeCell<[T]>> {}
+#[cfg(feature = "alloc")]
 unsafe impl<T: Send + Sync> Sync for UnsafeCellSlice<Box<UnsafeCell<[T]>>> {}
 
+#[cfg(feature = "alloc")]
 impl<T> From<UnsafeCellSlice<Box<UnsafeCell<[T]>>>> for Box<[T]> {
     #[inline]
     fn from(value: UnsafeCellSlice<Box<UnsafeCell<[T]>>>) -> Self {
@@ -17,6 +21,7 @@ impl<T> From<UnsafeCellSlice<Box<UnsafeCell<[T]>>>> for Box<[T]> {
     }
 }
 
+#[cfg(feature = "alloc")]
 impl<T> From<UnsafeCellSlice<Box<UnsafeCell<[T]>>>> for Vec<T> {
     #[inline]
     fn from(value: UnsafeCellSlice<Box<UnsafeCell<[T]>>>) -> Self {
@@ -31,6 +36,7 @@ impl<'a, T> UnsafeCellSlice<&'a mut UnsafeCell<[T]>> {
     }
 }
 
+#[cfg(feature = "alloc")]
 impl<T> UnsafeCellSlice<Box<UnsafeCell<[T]>>> {
     /// Creates a new owned slice.
     pub(crate) fn new_owned(slice: Box<[T]>) -> Self {

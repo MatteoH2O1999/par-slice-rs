@@ -1,3 +1,4 @@
+#![cfg(feature = "alloc")]
 use par_slice::*;
 use std::thread::scope;
 

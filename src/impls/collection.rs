@@ -1,6 +1,7 @@
 use crate::*;
 
-unsafe impl<T> TrustedSizedCollection for Vec<T> {
+#[cfg(feature = "alloc")]
+unsafe impl<T> TrustedSizedCollection for alloc::vec::Vec<T> {
     #[inline]
     fn len(&self) -> usize {
         self.len()

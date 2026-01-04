@@ -41,7 +41,8 @@ unsafe impl<T: Send + Sync> ParIndexView<T> for [T] {
     }
 }
 
-unsafe impl<T: Send + Sync> IntoParIndex<T> for Box<[T]> {
+#[cfg(feature = "alloc")]
+unsafe impl<T: Send + Sync> IntoParIndex<T> for alloc::boxed::Box<[T]> {
     #[inline]
     fn into_pointer_par_index(self) -> impl PointerIndex<T> + ParCollection<T, Self> {
         UnsafeCellSlice::new_owned(self)
@@ -85,7 +86,8 @@ unsafe impl<T: Send + Sync> IntoParIndex<T> for Box<[T]> {
     }
 }
 
-unsafe impl<T: Send + Sync> IntoParIndex<T> for Vec<T> {
+#[cfg(feature = "alloc")]
+unsafe impl<T: Send + Sync> IntoParIndex<T> for alloc::vec::Vec<T> {
     #[inline]
     fn into_pointer_par_index(self) -> impl PointerIndex<T> + ParCollection<T, Self> {
         UnsafeCellSlice::new_owned(self.into_boxed_slice())
