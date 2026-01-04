@@ -2,7 +2,9 @@ mod collection;
 
 mod conversion;
 
+#[cfg(feature = "alloc")]
 mod constructor;
+#[cfg(feature = "alloc")]
 pub use constructor::*;
 
 mod indexing;

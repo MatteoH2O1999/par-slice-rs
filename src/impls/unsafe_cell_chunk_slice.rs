@@ -1,5 +1,7 @@
 use crate::*;
-use std::{cell::UnsafeCell, mem::size_of, ops::Deref};
+#[cfg(feature = "alloc")]
+use alloc::{boxed::Box, vec::Vec};
+use core::{cell::UnsafeCell, mem::size_of, ops::Deref};
 
 /// Wrapper around an [`UnsafeCell`] (either mutable reference or owned)
 /// that divides the underlying slice in chunks.
@@ -13,8 +15,10 @@ pub(crate) struct UnsafeCellChunkSlice<B> {
 // Safety: access paradigms shift responsability to the user to ensure
 // no data races happen.
 unsafe impl<T: Send + Sync> Sync for UnsafeCellChunkSlice<&mut UnsafeCell<[T]>> {}
+#[cfg(feature = "alloc")]
 unsafe impl<T: Send + Sync> Sync for UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {}
 
+#[cfg(feature = "alloc")]
 impl<T> From<UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>> for Box<[T]> {
     #[inline]
     fn from(value: UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>) -> Self {
@@ -22,6 +26,7 @@ impl<T> From<UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>> for Box<[T]> {
     }
 }
 
+#[cfg(feature = "alloc")]
 impl<T> From<UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>> for Vec<T> {
     #[inline]
     fn from(value: UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>>) -> Self {
@@ -47,6 +52,7 @@ impl<'a, T> UnsafeCellChunkSlice<&'a mut UnsafeCell<[T]>> {
     }
 }
 
+#[cfg(feature = "alloc")]
 impl<T> UnsafeCellChunkSlice<Box<UnsafeCell<[T]>>> {
     /// Creates a new owned slice with chunks of `chunk_size`.
     ///
@@ -127,7 +133,7 @@ unsafe impl<T, B: Deref<Target = UnsafeCell<[T]>>> PointerIndex<[T]> for UnsafeC
             // offset stays in bounds of allocated object
             ptr = ptr.add(offset);
         }
-        std::ptr::slice_from_raw_parts_mut(ptr, self.chunk_size)
+        core::ptr::slice_from_raw_parts_mut(ptr, self.chunk_size)
     }
 }
 

@@ -1,4 +1,5 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![no_std]
 
 //! ParSlice is a utility crate to allow easier access to data in parallel
 //! when data races are avoided at compile time or through other means but the
@@ -270,3 +271,6 @@ pub use impls::*;
 
 mod traits;
 pub use traits::*;
+
+#[cfg(feature = "alloc")]
+extern crate alloc;

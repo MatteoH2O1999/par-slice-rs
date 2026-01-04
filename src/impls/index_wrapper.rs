@@ -42,7 +42,7 @@ macro_rules! wrapper_method_doc {
 /// [`UnsafeNoRefIndex`], [`UnsafeNoRefChunkIndex`] and [`UnsafeIndex`].
 pub struct IndexWrapper<I, T: ?Sized, B> {
     inner: B,
-    _marker: std::marker::PhantomData<(I, T)>,
+    _marker: core::marker::PhantomData<(I, T)>,
 }
 
 impl<T: ?Sized, B: ParView<T>> IndexWrapper<(), T, B> {
@@ -58,7 +58,7 @@ impl<T: ?Sized, B: ParView<T>> IndexWrapper<(), T, B> {
     pub fn new<I: AsUsize>(collection: B) -> IndexWrapper<I, T, B> {
         IndexWrapper {
             inner: collection,
-            _marker: std::marker::PhantomData,
+            _marker: core::marker::PhantomData,
         }
     }
 }

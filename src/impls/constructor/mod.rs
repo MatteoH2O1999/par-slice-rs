@@ -7,6 +7,8 @@ pub use pointer::*;
 mod unsafe_index;
 pub use unsafe_index::*;
 
+use alloc::boxed::Box;
+
 /// Creates a new boxed slice of `len` elements, each initialized to the return value
 /// of `closure`.
 pub(crate) fn new_boxed_slice_with<T>(len: usize, mut closure: impl FnMut(usize) -> T) -> Box<[T]> {

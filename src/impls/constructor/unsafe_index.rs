@@ -1,4 +1,5 @@
 use crate::*;
+use alloc::boxed::Box;
 
 /// Utility struct for contructors for slices that allow unsynchronized access
 /// to their elements through [`UnsafeIndex`] and [`UnsafeChunkIndex`].
